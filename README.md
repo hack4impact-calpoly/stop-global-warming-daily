@@ -23,6 +23,7 @@ The Stop Global Warming Daily team consists of 5 Cal Poly students. Over the cou
 - [First Last](https://www.linkedin.com/) - Designer
 - [Ellie Pearson](https://www.linkedin.com/in/ellie-pearson-b21099295/) - Tech Lead
 - [Brady Welsh](https://www.linkedin.com/in/brady-welsh7/) - Tech Lead
+- [Julian Labbe](https://www.linkedin.com/in/julian-labbe-862626330/) - Software Developer
 - [First Last](https://www.linkedin.com/) - Software Developer
 
 ## Getting Started And Contributing
