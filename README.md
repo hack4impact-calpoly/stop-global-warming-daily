@@ -28,6 +28,7 @@ The Stop Global Warming Daily team consists of 5 Cal Poly students. Over the cou
 - [Victor Herrera](https://www.linkedin.com/in/victorherrera571/) - Software Developer
 - [Anthony Mendoza](https://www.linkedin.com/in/anthonymend/) -Software Developer
 - [Daniel Erazo](https://www.linkedin.com/in/danzo/) - Software Developer
+- [Jonathan Lau](https://www.linkedin.com/in/jjonathanlauu/) - Software Developer
 
 ## Getting Started And Contributing
 
