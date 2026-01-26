@@ -1,10 +1,12 @@
 import Navbar from "@/components/Navbar";
-
+import { Box, Text } from "@chakra-ui/react";
 export default function Home() {
   return (
     <main>
       <Navbar />
-      <h1>Home</h1>
+      <Box>
+        <Text>Home</Text>
+      </Box>
     </main>
   );
 }
