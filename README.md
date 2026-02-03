@@ -17,7 +17,7 @@ Stop Global Warming Daily has a goal of getting everyone involved. They have cre
 
 ### Team
 
-The Stop Global Warming Daily team consists of 5 Cal Poly students. Over the course of about 9 months, we worked as a team to deploy this web application. The team members are listed below:
+The Stop Global Warming Daily team consists of 13 Cal Poly students. Over the course of about 9 months, we worked as a team to deploy this web application. The team members are listed below:
 
 - [Ashley Butz](https://www.linkedin.com/in/ashley-butz/) - Project Manager
 - [Ethan Sautto](https://www.linkedin.com/in/ethansautto/) - Designer
