@@ -3,7 +3,7 @@ import { Box, Grid, HStack, IconButton, Text, VStack } from "@chakra-ui/react";
 import { IoMdCheckmark } from "react-icons/io";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
-export default function Calendar() {
+export default function MonthlyCalendar() {
   // Letters shown at the top of the calendar
   const weekDays = ["S", "M", "T", "W", "T", "F", "S"];
   // Fake calendar data for now
