@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const url: string = process.env.MONGO_URI as string;
-let connection: typeof mongoose;
+let connection: typeof mongoose | null = null;
 
 /**
  * Makes a connection to a MongoDB database. If a connection already exists, does nothing
@@ -9,12 +9,16 @@ let connection: typeof mongoose;
  * @returns {Promise<typeof mongoose>}
  */
 const connectDB = async () => {
-  if (!connection) {
-    // uncomment this line once you have the MONGO_URI set up
-    // connection = await mongoose.connect(url);
-    connection = "remove me" as any; // remove me
+  if (connection) {
     return connection;
   }
+
+  if (!url) {
+    throw new Error("MONGO_URI is not set");
+  }
+
+  connection = await mongoose.connect(url);
+  return connection;
 };
 
 export default connectDB;

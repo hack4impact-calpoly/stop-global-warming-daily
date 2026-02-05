@@ -1,9 +1,9 @@
+import { Box } from "@chakra-ui/react";
+import MonthlyCalendar from "@/components/MonthlyCalendar";
 export default function Page() {
   return (
-    <>
-      <div>
-        <h1>Calendar</h1>
-      </div>
-    </>
+    <Box display={"flex"} justifyContent={"center"}>
+      <MonthlyCalendar></MonthlyCalendar>
+    </Box>
   );
 }
