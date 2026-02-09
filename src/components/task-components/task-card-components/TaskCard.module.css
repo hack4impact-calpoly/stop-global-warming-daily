@@ -1,0 +1,39 @@
+.taskCardContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgb(224, 224, 224);
+  margin-bottom: 20px;
+}
+
+.taskCardCompleted {
+  color: white;
+}
+
+.taskCardNotCompleted {
+  color: black;
+}
+
+.taskCardCompleted .taskCardContainer {
+  background: linear-gradient(to bottom right, hsl(210, 45%, 35%), hsl(211, 33%, 65%));
+}
+
+.taskCardDetails p {
+  margin: 0;
+}
+
+.taskCardDetails h2 {
+  font-weight: 600;
+  margin: 0;
+}
+
+.taskCardIcon {
+  stroke-width: 2.5;
+  height: 50px;
+  width: 50px;
+  flex-shrink: 0;
+  margin-left: 5px;
+}

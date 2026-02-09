@@ -14,7 +14,7 @@ interface FormattedDateProps {
     @param date Date object to be formatted
 */
 export default function FormattedDate({ date }: FormattedDateProps) {
-  const dayStringAbbr = date.toLocaleDateString("en-us");
+  const dayStringAbbr = date.toLocaleDateString("en-US");
   const dayOfTheMonth = date.getDate();
   return (
     <div className={Style.formattedDateContainer}>
