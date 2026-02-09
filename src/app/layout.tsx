@@ -13,8 +13,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <Navbar />
-        <Provider>{children}</Provider>
+        <Provider>
+          {/* paddingBottom prevents content from hiding behind fixed navbar */}
+          <div style={{ minHeight: "100vh", paddingBottom: "120px" }}>
+            {children}
+            <Navbar />
+          </div>
+        </Provider>
       </body>
     </html>
   );
