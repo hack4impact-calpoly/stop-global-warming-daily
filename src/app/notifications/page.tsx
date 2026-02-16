@@ -19,20 +19,23 @@ export default function Page() {
   ];
 
   return (
-    <Box w={"full"} h={"full"}>
-      <VStack h={"full"} gap={0}>
-        <HStack w={"full"} px={5} mb={5} justify="space-between" alignItems={"center"}>
-          <HStack gap={2}>
-            <Link href="/" style={{ display: "flex", cursor: "pointer" }}>
-              <LuChevronLeft size={"24px"} />
+    <Box display={"flex"} alignItems={"center"} justifyContent={"center"}>
+      <VStack maxW={400} w={"full"} gap={0}>
+        <HStack w="full" px="20px" py="20px" justify="space-between">
+          <HStack gap={3} align="baseline">
+            <Link href="/" style={{ display: "inline-flex" }}>
+              <LuChevronLeft size={24} style={{ display: "block" }} />
             </Link>
-            <Text fontSize="32px" fontWeight="semibold">
+            <Text fontSize="32px" fontWeight="semibold" lineHeight="1" display="inline">
               Notifications
             </Text>
           </HStack>
-          <LuSettings size={"24px"} />
+          <Link href="/settings" style={{ display: "inline-flex" }}>
+            <LuSettings size={24} style={{ display: "block" }} />
+          </Link>
         </HStack>
-        <VStack w={"full"} gap={0}>
+
+        <VStack w={"full"} gap={0} mb={20}>
           {notifications.map((n) => (
             <NotificationCard key={n.id} title={n.title} timeAgo={n.timeAgo} icon={n.icon} unread={n.unread} />
           ))}
@@ -42,7 +45,7 @@ export default function Page() {
           <VStack mt={-8} gap={1}>
             <Text fontSize={24}>No more notifications</Text>
             <Text w={"200px"} textAlign={"center"} fontSize={11} fontWeight="medium" lineHeight={1}>
-              Missing notifications? Visit your{" "}
+              Missing notifications? Visit your <br />
               <Text as="span" color="#0084FF" textDecoration="underline">
                 historical notifications
               </Text>

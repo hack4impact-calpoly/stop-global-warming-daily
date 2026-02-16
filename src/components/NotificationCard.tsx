@@ -9,7 +9,7 @@ type Props = {
 
 export default function NotificationCard({ title, timeAgo, icon, unread }: Props) {
   return (
-    <HStack w="full" py={6} px={5} borderBottom=".5px solid" borderColor="#16243F" justify="space-between">
+    <HStack w="full" py={4} px={5} borderBottom=".5px solid" borderColor="#16243F" justify="space-between">
       <HStack align="center" gap={8}>
         <VStack align="flex-start" gap={0} flex={1}>
           <Text fontSize="16px" fontWeight="semibold">
