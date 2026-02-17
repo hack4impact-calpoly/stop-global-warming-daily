@@ -30,7 +30,7 @@ export default function Navbar() {
       <HStack
         px={{ base: 4, sm: 8 }}
         py={{ base: 3, sm: 4 }}
-        spacing={{ base: 3, sm: 6 }} // consistent spacing between icons
+        gap={{ base: 3, sm: 6 }} // consistent spacing between icons
         bg="white"
         borderRadius="999px"
         boxShadow="0 18px 40px rgba(0,0,0,0.18)"
@@ -42,7 +42,7 @@ export default function Navbar() {
           return (
             <Link key={item.href} href={item.href} style={{ textDecoration: "none" }}>
               <VStack
-                spacing={{ base: 0.5, sm: 1 }} // internal spacing
+                gap={{ base: 0.5, sm: 1 }} // internal spacing
                 px={{ base: 2, sm: 3 }} // consistent padding per tab
                 py={{ base: 1, sm: 1.5 }}
                 minW={{ base: "64px", sm: "72px" }} // consistent width per tab
@@ -56,7 +56,9 @@ export default function Navbar() {
                   color={isActive ? "#304C89" : "gray.800"}
                   lineHeight="1" // prevent vertical fidgeting
                   textAlign="center"
-                  noOfLines={1} // prevent wrap changing widths
+                  whiteSpace="nowrap" // prevent wrap changing widths
+                  overflow="hidden" // prevent wrap changing widths
+                  textOverflow="ellipsis" // prevent wrap changing widths
                   maxW={{ base: "64px", sm: "72px" }}
                 >
                   {item.label}
