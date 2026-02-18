@@ -1,0 +1,10 @@
+.dividerContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  line-height: 1;
+}
+
+.dividerBar {
+  color: hsl(231, 39%, 93%);
+}
