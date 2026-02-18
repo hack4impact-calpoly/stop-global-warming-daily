@@ -1,7 +1,7 @@
-import { Schema, model } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 export type IResources = {
-  _id: string; //id only in type
+  _id: string;
   title: string;
   description: string;
   picture: string;
@@ -22,6 +22,6 @@ const resourceSchema = new Schema(
   },
 );
 
-const ResourceModel = model<IResources>("DevResource", resourceSchema);
+const ResourceModel = mongoose.models.DevResource || mongoose.model<IResources>("DevResource", resourceSchema);
 
 export default ResourceModel;
