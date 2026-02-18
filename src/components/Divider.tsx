@@ -13,7 +13,7 @@ export default function DividerProps({ children }: DividerProps) {
       {items.map((item, idx) => (
         <React.Fragment key={idx}>
           {item}
-          {idx < items.length - 1 && <span className={Style.dividerBar}> | </span>}
+          {idx < items.length - 1 && <span className={Style.dividerBar}>|</span>}
         </React.Fragment>
       ))}
     </div>
