@@ -1,0 +1,13 @@
+.dividerContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  line-height: 1;
+  gap: 4px;
+}
+
+.dividerBar {
+  color: #3b3b3b;
+  font-size: small;
+  font-weight: bold;
+}
