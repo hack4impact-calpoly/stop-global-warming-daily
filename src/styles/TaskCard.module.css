@@ -1,0 +1,35 @@
+.taskCardContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: white;
+  padding: 8px;
+  border-radius: 8px;
+  width: 100%;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.taskCardDetailsContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: left;
+}
+
+.taskCardTitle {
+  font-size: medium;
+  font-weight: bold;
+  color: #3b3b3b;
+}
+
+.taskCardEstimate {
+  color: #3b3b3b;
+  font-size: small;
+  font-weight: bold;
+}
+
+.taskCardDescription {
+  color: #3b3b3b;
+  font-size: small;
+}
