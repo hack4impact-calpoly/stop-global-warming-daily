@@ -3,11 +3,11 @@
   flex-direction: row;
   align-items: center;
   background-color: white;
-  padding: 8px;
+  padding: 12px;
   border-radius: 8px;
   width: 100%;
-  gap: 8px;
-  margin-bottom: 5px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .taskCardDetailsContainer {
