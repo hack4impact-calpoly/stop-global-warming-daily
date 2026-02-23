@@ -2,6 +2,7 @@ import { Box, IconButton, Text, VStack, HStack } from "@chakra-ui/react";
 import ProgressRing from "@/components/ProgressRing";
 import { LuChevronLeft, LuChevronRight, LuBell } from "react-icons/lu";
 import Link from "next/link";
+import TaskList from "@/components/TaskList";
 
 export default function Home() {
   return (
@@ -31,6 +32,8 @@ export default function Home() {
             </HStack>
             <ProgressRing percent={70} isClockwise={false} />
           </VStack>
+          {/* Tasks */}
+          <TaskList />
         </VStack>
       </Box>
     </main>
