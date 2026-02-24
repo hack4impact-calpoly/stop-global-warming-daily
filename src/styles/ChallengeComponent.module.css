@@ -1,0 +1,70 @@
+.challengeContainer {
+  width: 100%;
+  border: 1px solid #d2d9e5;
+  border-radius: 16px;
+  background: #f7f9fc;
+  overflow: hidden;
+}
+
+.challengeTrigger {
+  width: 100%;
+  padding: 16px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.challengeHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.challengeTitle {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #243b67;
+}
+
+.challengeCompletion {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.1;
+}
+
+.challengeCompletionValue {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2f4f7f;
+}
+
+.challengeCompletionLabel {
+  font-size: 0.8rem;
+  color: #58739d;
+}
+
+.progressRoot {
+  margin-top: 12px;
+}
+
+.progressTrack {
+  height: 14px;
+  border-radius: 999px;
+  background: #d8e2f0;
+  overflow: hidden;
+}
+
+.progressRange {
+  border-radius: 999px;
+}
+
+.challengeTasks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 16px 16px;
+  background: #f7f9fc;
+}

@@ -1,5 +1,6 @@
 import { Box, IconButton, Text, VStack, HStack } from "@chakra-ui/react";
 import ProgressRing from "@/components/ProgressRing";
+import ChallengeComponent, { ChallengeSummary, ChallengeTask } from "@/components/ChallengeComponent";
 import { LuChevronLeft, LuChevronRight, LuBell } from "react-icons/lu";
 import Link from "next/link";
 
