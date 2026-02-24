@@ -1,7 +1,7 @@
 import React from "react";
 import { Collapsible, Progress, Text } from "@chakra-ui/react";
-import TaskCard from "./TaskCard";
-import Style from "../styles/ChallengeComponent.module.css";
+import TaskCard from "@/components/TaskCard";
+import Style from "@/styles/ChallengeComponent.module.css";
 
 export type ChallengeTask = {
   _id: string;
@@ -17,7 +17,6 @@ export type ChallengeSummary = {
   title: string;
   task_ids: string[];
   users: string[];
-  color: string;
 };
 
 interface ChallengeComponentProps {
@@ -47,13 +46,13 @@ export default function ChallengeComponent({
         </div>
         <Progress.Root value={safeCompletion} size="sm" className={Style.progressRoot}>
           <Progress.Track className={Style.progressTrack}>
-            <Progress.Range className={Style.progressRange} style={{ backgroundColor: challenge.color }} />
+            <Progress.Range className={Style.progressRange} style={{ backgroundColor: "#296184" }} />
           </Progress.Track>
         </Progress.Root>
       </Collapsible.Trigger>
 
       <Collapsible.Content>
-        <div className={Style.challengeTasks} style={{ backgroundColor: `${challenge.color}12` }}>
+        <div className={Style.challengeTasks}>
           {tasks.map((task) => (
             <TaskCard
               key={task._id}
