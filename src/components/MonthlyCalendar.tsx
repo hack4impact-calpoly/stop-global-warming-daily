@@ -46,21 +46,6 @@ export default function MonthlyCalendar() {
   ];
   return (
     <VStack maxW="345px" w="full" align="stretch" gap={0}>
-      {/* Top row with month on left and arrows on the right */}
-      <HStack w={"full"} h={"29px"} justify="space-between" align="center">
-        <Text fontSize="24px" fontWeight="semibold" color="black">
-          January
-        </Text>
-        <HStack gap={2}>
-          <IconButton variant="ghost" size={"xs"}>
-            <FaChevronLeft />
-          </IconButton>
-
-          <IconButton variant="ghost" size={"xs"}>
-            <FaChevronRight />
-          </IconButton>
-        </HStack>
-      </HStack>
       {/* Wrapper for weekday row and day grid */}
       <Box>
         {/* Weekday labels */}
