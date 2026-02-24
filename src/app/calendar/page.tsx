@@ -3,26 +3,10 @@ import { Box, VStack, Text, HStack } from "@chakra-ui/react";
 import MonthlyCalendar from "@/components/MonthlyCalendar";
 import React from "react";
 import CalendarSubHeader from "@/components/CalendarSubHeader";
+import CalendarSwitchButton from "@/components/CalendarSwitchButton";
+
 export default function Page() {
   const [view, setView] = React.useState<"D" | "W" | "M">("M");
-
-  const styleButton = (selectView: string, option: string) => {
-    const selected = selectView === option;
-    return {
-      w: "30px",
-      h: "30px",
-      borderRadius: "full",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      cursor: "pointer",
-      bg: selected ? "blue.400" : "transparent",
-      color: "black",
-      _hover: {
-        bg: selected ? "#5C7DE0" : "#DDE0EC",
-      },
-    };
-  };
 
   const showCalendar = (selectCalendar: string) => {
     if (selectCalendar === "D")
@@ -56,15 +40,9 @@ export default function Page() {
             My Calendar
           </Text>
           <HStack bg="#E6E8F2" px={1} py={1} borderRadius="full" align="center">
-            <Box {...styleButton(view, "D")} onClick={() => setView("D")}>
-              D
-            </Box>
-            <Box {...styleButton(view, "W")} onClick={() => setView("W")}>
-              W
-            </Box>
-            <Box {...styleButton(view, "M")} onClick={() => setView("M")}>
-              M
-            </Box>
+            <CalendarSwitchButton label="D" selected={view === "D"} onClick={() => setView("D")} />
+            <CalendarSwitchButton label="W" selected={view === "W"} onClick={() => setView("W")} />
+            <CalendarSwitchButton label="M" selected={view === "M"} onClick={() => setView("M")} />
           </HStack>
         </HStack>
         {showCalendar(view)}
