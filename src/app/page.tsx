@@ -3,6 +3,7 @@ import ProgressRing from "@/components/ProgressRing";
 import ChallengeComponent, { ChallengeSummary, ChallengeTask } from "@/components/ChallengeComponent";
 import { LuChevronLeft, LuChevronRight, LuBell } from "react-icons/lu";
 import Link from "next/link";
+import TaskList from "@/components/TaskList";
 
 export default function Home() {
   return (
@@ -32,6 +33,8 @@ export default function Home() {
             </HStack>
             <ProgressRing percent={70} isClockwise={false} />
           </VStack>
+          {/* Tasks */}
+          <TaskList />
         </VStack>
       </Box>
     </main>
