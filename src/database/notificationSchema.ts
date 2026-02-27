@@ -3,6 +3,7 @@ import mongoose, { Schema } from "mongoose";
 export type INotification = {
   _id: string;
   description: string;
+  isRead: boolean;
   userId: string;
   time: Date;
 };
@@ -11,7 +12,8 @@ const notificationSchema = new Schema(
   {
     description: { type: String, required: true },
     userId: { type: String, required: true },
-    time: { type: Date, required: true, default: Date.now },
+    isRead: { type: Boolean, default: false },
+    time: { type: Date, default: Date.now },
   },
   {
     collection: "notifications",
