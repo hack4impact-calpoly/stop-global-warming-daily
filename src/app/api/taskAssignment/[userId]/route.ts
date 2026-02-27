@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/database/db";
 import TaskAssignment from "@/database/taskAssignmentSchema";
 
+// get user's assignment by date, default is "today"
 export async function GET(req: NextRequest, { params }: { params: { userId: string } }) {
   try {
     await connectDB();
@@ -15,14 +16,10 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + 1);
 
-    const taskAssignment = await TaskAssignment.findOne({
+    const taskAssignment = await TaskAssignment.find({
       user_id: params.userId,
       date: { $gte: startDate, $lt: endDate },
     });
-
-    if (!taskAssignment) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
-    }
 
     return NextResponse.json(taskAssignment, { status: 200 });
   } catch (err) {
