@@ -2,13 +2,28 @@
 import { Box, VStack, Text, Field, Input, Button } from "@chakra-ui/react";
 import { FaEye } from "react-icons/fa";
 import React, { useState } from "react";
+import { SignUp, useSignUp } from "@clerk/nextjs";
+import { verify } from "crypto";
+import { setDragLock } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
+  // clerk hook
+  const { isLoaded, signUp, setActive } = useSignUp();
+  const router = useRouter();
+
+  // for verification
+  const [verifying, setVerifying] = useState<boolean>(false);
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
+
+  const [code, setCode] = useState<string>("");
+  const [codeError, setCodeError] = useState<string>("");
+
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
+  const [emailAddress, setEmailAddress] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
   const [firstError, setFirstError] = useState<string>("");
@@ -25,24 +40,24 @@ export default function Page() {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    console.log("Current data!");
-    console.log(`Name: ${firstName} + ${lastName}`);
-    console.log(`Email: ${email}`);
-    console.log(`Password: ${password}`);
-
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // check to make sure we're loaded
+    if (!isLoaded) {
+      return;
+    }
 
     // check for empty fields!
 
-    if (!firstName || !lastName || !email || !password) {
+    if (!firstName || !lastName || !emailAddress || !password) {
       if (!firstName) {
         setFirstError("This field is required");
       }
       if (!lastName) {
         setLastError("This field is required");
       }
-      if (!email) {
+      if (!emailAddress) {
         setEmailError("This field is required");
       }
       if (!password) {
@@ -51,10 +66,73 @@ export default function Page() {
 
       return;
     }
+
+    // try to connect to clerk!!
+
+    try {
+      await signUp.create({
+        emailAddress,
+        password,
+        firstName,
+        lastName,
+      });
+
+      // sent verification code
+      await signUp.prepareEmailAddressVerification({
+        strategy: "email_code",
+      });
+
+      setVerifying(true);
+    } catch (err: any) {
+      console.error(JSON.stringify(err, null, 2));
+      let error = err.errors[0];
+      if (error.code.includes("password")) {
+        setPasswordError(error.longMessage);
+      } else {
+        setEmailError(error.longMessage);
+      }
+    }
     return;
   };
 
-  return (
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsVerifying(true);
+
+    if (!isLoaded) return <div>Loading...</div>;
+
+    // try the given code!
+    try {
+      console.log(code);
+      const verifyAttempt = await signUp.attemptEmailAddressVerification({ code });
+
+      // if complete, set session to active and redirect user
+      if (verifyAttempt.status === "complete") {
+        // TODO: Create User Object
+
+        await setActive({
+          session: verifyAttempt.createdSessionId,
+          navigate: async ({ session }) => {
+            if (session?.currentTask) {
+              console.log(session?.currentTask);
+              return;
+            }
+            router.push("/");
+          },
+        });
+      } else {
+        setCodeError("Incorrect Code!");
+        console.error("Sign up attempt not complete: ", verifyAttempt);
+        console.error("Sign up attempt status:", verifyAttempt.status);
+        setIsVerifying(false);
+      }
+    } catch (err: any) {
+      console.error(JSON.stringify(err, null, 2));
+      setIsVerifying(false);
+    }
+  };
+
+  return !verifying ? (
     <>
       <Box display={"flex"} justifyContent={"center"}>
         <VStack maxW="345px" w="full" gap={2} px={3} py={3}>
@@ -68,6 +146,7 @@ export default function Page() {
                 First Name <Field.RequiredIndicator />
               </Field.Label>
               <Input
+                value={firstName}
                 placeholder="First Name"
                 variant="subtle"
                 onChange={(e) => {
@@ -82,6 +161,7 @@ export default function Page() {
                 Last Name <Field.RequiredIndicator />
               </Field.Label>
               <Input
+                value={lastName}
                 placeholder="Last Name"
                 variant="subtle"
                 onChange={(e) => {
@@ -96,12 +176,13 @@ export default function Page() {
                 Email <Field.RequiredIndicator />
               </Field.Label>
               <Input
+                value={emailAddress}
                 placeholder="Enter your email"
                 variant="subtle"
                 type="email"
                 onChange={(e) => {
                   setEmailError("");
-                  setEmail(e.target.value);
+                  setEmailAddress(e.target.value);
                 }}
               />
               <Field.ErrorText>{emailError}</Field.ErrorText>
@@ -111,6 +192,7 @@ export default function Page() {
                 Password <Field.RequiredIndicator />
               </Field.Label>
               <Input
+                value={password}
                 placeholder="Enter a password"
                 variant="subtle"
                 onChange={checkValidPassowrd}
@@ -131,6 +213,45 @@ export default function Page() {
             <Field.Root py={5}>
               <Button width="full" bg="#296184" color="white" _hover={{ bg: "#17374b" }} onClick={handleSubmit}>
                 Create Account
+              </Button>
+            </Field.Root>
+          </VStack>
+        </VStack>
+      </Box>
+    </>
+  ) : (
+    <>
+      <Box display={"flex"} justifyContent={"center"}>
+        <VStack maxW="345px" w="full" gap={2} px={3} py={3}>
+          <Text fontSize="34px" fontWeight="semibold" color="black">
+            Verifying
+          </Text>
+          <VStack display="flex" justifyContent="center" py={10} w="100%" gap={3}>
+            <Field.Root required invalid={codeError != ""}>
+              <Field.Label fontSize="30px" py={3}>
+                Code
+              </Field.Label>
+              <Input
+                value={code}
+                placeholder="Code"
+                variant="subtle"
+                onChange={(e) => {
+                  setCodeError("");
+                  setCode(e.target.value);
+                }}
+              />
+              <Field.ErrorText>{codeError}</Field.ErrorText>
+            </Field.Root>
+            <Field.Root>
+              <Button
+                loading={isVerifying}
+                width="full"
+                bg="#296184"
+                color="white"
+                _hover={{ bg: "#17374b" }}
+                onClick={handleVerify}
+              >
+                Verify
               </Button>
             </Field.Root>
           </VStack>
