@@ -2,6 +2,10 @@ import { Box, HStack, Text, VStack } from "@chakra-ui/react";
 import { LuMailbox, LuChevronLeft, LuSettings } from "react-icons/lu";
 import Link from "next/link";
 import NotificationCard from "@/components/NotificationCard";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { IUsers } from "@/database/userSchema";
+import { useUser } from "@clerk/nextjs";
 
 type Notification = {
   id: string;
@@ -12,6 +16,42 @@ type Notification = {
 };
 
 export default function Page() {
+  const { isSignedIn, user, isLoaded } = useUser();
+  const [userData, setUserData] = useState<IUsers | null>(null);
+
+  const router = useRouter();
+
+  // if user is not signed in redirect to login page
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    if (!isSignedIn) {
+      router.push("/login");
+    }
+  }, [isLoaded, isSignedIn, router]);
+
+  useEffect(() => {
+    const getUser = async () => {
+      if (user && isSignedIn) {
+        let res = await fetch(`/api/user/email/${user.emailAddresses[0].emailAddress}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (res) {
+          const userObj = await res.json();
+          setUserData(userObj);
+          console.log("user is signed in!");
+        }
+      }
+    };
+    if (!isLoaded) {
+      return;
+    }
+    // get user
+    getUser();
+  }, [isLoaded, isSignedIn, user]);
+
   const notifications: Notification[] = [
     { id: "1", title: "You reached a personal best!", timeAgo: "23hr ago", icon: "🏆", unread: true },
     { id: "2", title: "Spring Challenges are here!", timeAgo: "2 days ago", unread: false },

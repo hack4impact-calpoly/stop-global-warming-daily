@@ -6,6 +6,10 @@ import { SignUp, useSignUp } from "@clerk/nextjs";
 import { verify } from "crypto";
 import { setDragLock } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { IUsers } from "@/database/userSchema";
+
+// TODO: add link to login page
+// TODO: if user is signed in already, do not let them access
 
 export default function Page() {
   // clerk hook
@@ -108,7 +112,16 @@ export default function Page() {
 
       // if complete, set session to active and redirect user
       if (verifyAttempt.status === "complete") {
-        // TODO: Create User Object
+        const data = {
+          email: emailAddress,
+          name: firstName + " " + lastName,
+        };
+
+        let res = await fetch("/api/user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
 
         await setActive({
           session: verifyAttempt.createdSessionId,
