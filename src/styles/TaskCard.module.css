@@ -1,3 +1,4 @@
+/* was used to style TaskCard.tsx, replaced with chakra styles */
 .taskCardContainer {
   display: flex;
   flex-direction: row;
