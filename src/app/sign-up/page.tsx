@@ -1,5 +1,5 @@
 "use client";
-import { Box, VStack, Text, Field, Input, Button } from "@chakra-ui/react";
+import { Box, VStack, Text, Field, Input, Button, HStack, Link } from "@chakra-ui/react";
 import { FaEye } from "react-icons/fa";
 import React, { useState } from "react";
 import { SignUp, useSignUp } from "@clerk/nextjs";
@@ -228,6 +228,12 @@ export default function Page() {
                 Create Account
               </Button>
             </Field.Root>
+            <HStack>
+              <Text>Already have an account?</Text>
+              <Link href="/login">
+                <Text color="#296184">Login</Text>
+              </Link>
+            </HStack>
           </VStack>
         </VStack>
       </Box>
@@ -241,8 +247,8 @@ export default function Page() {
           </Text>
           <VStack display="flex" justifyContent="center" py={10} w="100%" gap={3}>
             <Field.Root required invalid={codeError != ""}>
-              <Field.Label fontSize="30px" py={3}>
-                Code
+              <Field.Label fontSize="20px" py={3}>
+                Please enter the code send to {emailAddress}.
               </Field.Label>
               <Input
                 value={code}

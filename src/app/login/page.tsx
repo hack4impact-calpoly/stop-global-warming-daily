@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useSignIn } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { Box, VStack, Text, Field, Input, Button } from "@chakra-ui/react";
+import { Box, VStack, Text, Field, Input, Button, HStack, Link } from "@chakra-ui/react";
 import { FaEye } from "react-icons/fa";
 
 // TODO: check if user is signed in, if so, redirect them to a different page
@@ -122,6 +122,12 @@ export default function Page() {
                 Login
               </Button>
             </Field.Root>
+            <HStack>
+              <Text>Don&apos;t have an account?</Text>
+              <Link href="/sign-up">
+                <Text color="#296184">Sign up</Text>
+              </Link>
+            </HStack>
           </VStack>
         </VStack>
       </Box>
