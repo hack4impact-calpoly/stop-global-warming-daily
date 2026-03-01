@@ -6,9 +6,6 @@ import { useRouter } from "next/navigation";
 import { Box, VStack, Text, Field, Input, Button, HStack, Link } from "@chakra-ui/react";
 import { FaEye } from "react-icons/fa";
 
-// TODO: check if user is signed in, if so, redirect them to a different page
-// TODO: link to login page
-
 export default function Page() {
   const { isLoaded, signIn, setActive } = useSignIn();
 

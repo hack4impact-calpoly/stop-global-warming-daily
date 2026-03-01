@@ -4,7 +4,7 @@ export type ITasks = {
   _id: string;
   title: string;
   description: string;
-  points: number;
+  time: number;
 };
 
 const taskSchema = new Schema(
