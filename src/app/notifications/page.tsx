@@ -1,3 +1,4 @@
+"use client";
 import { Box, HStack, Text, VStack } from "@chakra-ui/react";
 import { LuMailbox, LuChevronLeft, LuSettings } from "react-icons/lu";
 import Link from "next/link";
