@@ -11,7 +11,7 @@ const taskSchema = new Schema(
   {
     title: { type: String, required: true },
     description: { type: String, required: true },
-    points: { type: Number, required: true },
+    time: { type: Number, required: true },
   },
   {
     collection: "devtasks",

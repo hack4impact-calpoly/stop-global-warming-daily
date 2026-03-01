@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Provider } from "@/components/ui/provider";
+import { ClerkProvider } from "@clerk/nextjs";
 import Navbar from "@/components/Navbar";
 import "./globals.css";
 
@@ -11,16 +12,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body>
-        <Provider>
-          {/* paddingBottom prevents content from hiding behind fixed navbar */}
-          <div style={{ minHeight: "100vh", paddingBottom: "120px" }}>
-            {children}
-            <Navbar />
-          </div>
-        </Provider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" suppressHydrationWarning>
+        <body>
+          <Provider>
+            {/* paddingBottom prevents content from hiding behind fixed navbar */}
+            <div style={{ minHeight: "100vh", paddingBottom: "120px" }}>
+              {children}
+              <Navbar />
+            </div>
+          </Provider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
