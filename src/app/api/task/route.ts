@@ -7,16 +7,16 @@ export async function POST(req: Request) {
     await connectDB();
 
     const body = await req.json();
-    const { title, description, points } = body;
+    const { title, description, time } = body;
 
-    if (!title || !description || points === undefined) {
+    if (!title || !description || time === undefined) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     const newTask = await TaskModel.create({
       title,
       description,
-      points,
+      time,
     });
 
     return NextResponse.json(newTask, { status: 201 });
