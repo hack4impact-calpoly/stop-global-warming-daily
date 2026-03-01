@@ -2,14 +2,8 @@
 import { Box, VStack, Text, Field, Input, Button, HStack, Link } from "@chakra-ui/react";
 import { FaEye } from "react-icons/fa";
 import React, { useState } from "react";
-import { SignUp, useSignUp } from "@clerk/nextjs";
-import { verify } from "crypto";
-import { setDragLock } from "framer-motion";
+import { useSignUp } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { IUsers } from "@/database/userSchema";
-
-// TODO: add link to login page
-// TODO: if user is signed in already, do not let them access
 
 export default function Page() {
   // clerk hook
