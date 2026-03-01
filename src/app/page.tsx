@@ -75,7 +75,7 @@ export default function Home() {
             <ProgressRing percent={70} isClockwise={false} />
           </VStack>
           {/* Tasks */}
-          <TaskList />
+          <TaskList userId={userData ? String(userData._id) : undefined} />
         </VStack>
       </Box>
     </main>
