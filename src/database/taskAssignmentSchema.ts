@@ -23,6 +23,10 @@ const taskAssignmentSchema = new Schema(
       type: Date,
       required: true,
     },
+    isComplete: {
+      type: Boolean,
+      required: true,
+    },
   },
   {
     collection: "devtaskassignments",
