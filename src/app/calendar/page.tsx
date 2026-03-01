@@ -1,20 +1,26 @@
 "use client";
 import { Box, VStack, Text, HStack } from "@chakra-ui/react";
-import MonthlyCalendar from "@/components/MonthlyCalendar";
-import React from "react";
-import CalendarSubHeader from "@/components/CalendarSubHeader";
-import CalendarSwitchButton from "@/components/CalendarSwitchButton";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { IUsers } from "@/database/userSchema";
 import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { DayView, WeekView, MonthView } from "@/components/calendar";
+import CalendarSwitchButton from "@/components/CalendarSwitchButton";
 
 export default function Page() {
-  const [view, setView] = React.useState<"D" | "W" | "M">("M");
+  //use URL queries to save selected tab
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const view = (searchParams.get("view") as "D" | "W" | "M") ?? "M";
+
   const { isSignedIn, user, isLoaded } = useUser();
   const [userData, setUserData] = useState<IUsers | null>(null);
 
   const router = useRouter();
+
+  const handleSetView = (v: "D" | "W" | "M") => {
+    router.replace(`${pathname}?view=${v}`);
+  };
 
   // if user is not signed in redirect to login page
   useEffect(() => {
@@ -48,40 +54,22 @@ export default function Page() {
   }, [isLoaded, isSignedIn, user]);
 
   const showCalendar = (selectCalendar: string) => {
-    if (selectCalendar === "D")
-      return (
-        <>
-          <CalendarSubHeader date="January 5th"></CalendarSubHeader>
-          <Box></Box>
-        </>
-      );
-    else if (selectCalendar === "W")
-      return (
-        <>
-          <CalendarSubHeader date="January 4-10"></CalendarSubHeader>
-          <Box></Box>
-        </>
-      );
-    else
-      return (
-        <>
-          <CalendarSubHeader date="January 2026"></CalendarSubHeader>
-          <MonthlyCalendar></MonthlyCalendar>
-        </>
-      );
+    if (selectCalendar === "D") return <DayView />;
+    if (selectCalendar === "W") return <WeekView />;
+    return <MonthView />;
   };
 
   return (
     <Box display={"flex"} justifyContent={"center"}>
-      <VStack maxW="345px" align="stretch" w="full" gap={2} px={3} py={3}>
-        <HStack justify="space-between" align="center">
-          <Text fontSize="34px" fontWeight="semibold" color="black">
+      <VStack maxW="400px" align="stretch" w="full" gap={2} px={5}>
+        <HStack w="full" justify="space-between" align="center">
+          <Text fontSize="4xl" letterSpacing="-0.05em" whiteSpace="nowrap" fontWeight={"semibold"}>
             My Calendar
           </Text>
-          <HStack bg="#E6E8F2" px={1} py={1} borderRadius="full" align="center">
-            <CalendarSwitchButton label="D" selected={view === "D"} onClick={() => setView("D")} />
-            <CalendarSwitchButton label="W" selected={view === "W"} onClick={() => setView("W")} />
-            <CalendarSwitchButton label="M" selected={view === "M"} onClick={() => setView("M")} />
+          <HStack bg="#E8F1F8" px={1} py={1} borderRadius="full" align="center">
+            <CalendarSwitchButton label="D" selected={view === "D"} onClick={() => handleSetView("D")} />
+            <CalendarSwitchButton label="W" selected={view === "W"} onClick={() => handleSetView("W")} />
+            <CalendarSwitchButton label="M" selected={view === "M"} onClick={() => handleSetView("M")} />
           </HStack>
         </HStack>
         {showCalendar(view)}
