@@ -2,8 +2,8 @@ import React from "react";
 import BoxedDate from "./BoxedDate";
 import Divider from "./Divider";
 import CompeletionIndicator from "./CompletionIndicator";
-import Style from "../styles/TaskCard.module.css";
-
+import { Box, HStack, Text, VStack, Collapsible } from "@chakra-ui/react";
+import { LuChevronRight } from "react-icons/lu";
 interface TaskCardProps {
   date: Date; // Date for the task
   title: String; // Title of the task
@@ -14,16 +14,58 @@ interface TaskCardProps {
 
 export default function TaskCard({ date, title, description, minEstimate, completed }: TaskCardProps) {
   return (
-    <div className={Style.taskCardContainer}>
-      <BoxedDate date={date} />
-      <div className={Style.taskCardDetailsContainer}>
-        <span className={Style.taskCardTitle}>{title}</span>
-        <Divider>
-          <span className={Style.taskCardEstimate}>{`~${minEstimate} min`}</span>
-          <CompeletionIndicator completed={completed} />
-        </Divider>
-        <p className={Style.taskCardDescription}>{description}</p>
-      </div>
-    </div>
+    <Collapsible.Root>
+      <VStack bg="white" p={3} borderRadius="lg" w="100%" gap={0} align="stretch">
+        {/* Header */}
+        <HStack align="flex-start" gap={4}>
+          <BoxedDate date={date} />
+          <VStack align="flex-start" gap={0} flex={1}>
+            <HStack align="flex-start" justify="space-between" w="100%">
+              <VStack align="flex-start" gap={0}>
+                <Text fontSize="lg" fontWeight="bold">
+                  {title}
+                </Text>
+                <Divider>
+                  <Text fontSize="sm">{`~${minEstimate} min`}</Text>
+                  <CompeletionIndicator completed={completed} />
+                </Divider>
+              </VStack>
+              <Collapsible.Trigger _open={{ transform: "rotate(90deg)" }} transition="transform 0.2s">
+                <LuChevronRight size="15px" />
+              </Collapsible.Trigger>
+            </HStack>
+            <Text
+              fontSize="sm"
+              w="100%"
+              overflow="hidden"
+              css={{ WebkitLineClamp: 2, display: "-webkit-box", WebkitBoxOrient: "vertical" }}
+            >
+              {description}
+            </Text>
+          </VStack>
+        </HStack>
+        {/* Full Description */}
+        <Collapsible.Content>
+          <VStack align="flex-start" gap={2} pt={3}>
+            <VStack align="flex-start" gap={1}>
+              <Text fontSize="sm" fontWeight="bold">
+                Why this task matters:
+              </Text>
+              <Text fontSize="sm">Doing this task can lower your carbon footprint by X%.</Text>
+            </VStack>
+            <VStack align="flex-start" gap={1}>
+              <Text fontSize="sm" fontWeight="bold">
+                Tips for completing it:
+              </Text>
+              {["Tip #1", "Tip #2", "Tip #3"].map((tip, index) => (
+                <Text key={index} fontSize="sm" lineHeight={1}>
+                  {`${index + 1}. ${tip}`}
+                </Text>
+              ))}
+            </VStack>
+          </VStack>
+        </Collapsible.Content>
+      </VStack>
+    </Collapsible.Root>
   );
 }
