@@ -3,23 +3,30 @@ import { Box, VStack, Text, HStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { IUsers } from "@/database/userSchema";
 import { useUser } from "@clerk/nextjs";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { DayView, WeekView, MonthView } from "@/components/calendar";
 import CalendarSwitchButton from "@/components/CalendarSwitchButton";
 
 export default function Page() {
-  //use URL queries to save selected tab
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const view = (searchParams.get("view") as "D" | "W" | "M") ?? "M";
+  //use localStorage to save selected tab
+  const [view, setView] = useState<"D" | "W" | "M">("D");
 
   const { isSignedIn, user, isLoaded } = useUser();
   const [userData, setUserData] = useState<IUsers | null>(null);
 
   const router = useRouter();
 
+  // restore saved view on mount
+  useEffect(() => {
+    const savedView = localStorage.getItem("calendarView");
+    if (savedView === "D" || savedView === "W" || savedView === "M") {
+      setView(savedView);
+    }
+  }, []);
+
   const handleSetView = (v: "D" | "W" | "M") => {
-    router.replace(`${pathname}?view=${v}`);
+    setView(v);
+    localStorage.setItem("calendarView", v);
   };
 
   // if user is not signed in redirect to login page
