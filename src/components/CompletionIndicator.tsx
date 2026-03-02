@@ -9,7 +9,7 @@ interface CompeletionIndicatorProps {
 export default function CompeletionIndicator({ completed }: CompeletionIndicatorProps) {
   return (
     <div className={completed ? Style.completionIndicatorCompleted : Style.completionIndicatorInProgress}>
-      <span className={Style.completionIndicatorText}>{completed ? "Completed" : "In progress"}</span>
+      <span className={Style.completionIndicatorText}>{completed ? "Completed" : "Not Started"}</span>
       <div className={Style.completionIndicatorIcon}>
         {completed ? <Check className={Style.completionCheckIcon} /> : <></>}
       </div>
