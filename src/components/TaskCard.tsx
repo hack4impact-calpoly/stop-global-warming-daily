@@ -53,16 +53,6 @@ export default function TaskCard({ date, title, description, minEstimate, comple
               </Text>
               <Text fontSize="sm">Doing this task can lower your carbon footprint by X%.</Text>
             </VStack>
-            <VStack align="flex-start" gap={1}>
-              <Text fontSize="sm" fontWeight="bold">
-                Tips for completing it:
-              </Text>
-              {["Tip #1", "Tip #2", "Tip #3"].map((tip, index) => (
-                <Text key={index} fontSize="sm" lineHeight={1}>
-                  {`${index + 1}. ${tip}`}
-                </Text>
-              ))}
-            </VStack>
           </VStack>
         </Collapsible.Content>
       </VStack>
