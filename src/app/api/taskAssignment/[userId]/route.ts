@@ -53,21 +53,31 @@ export async function PATCH(req: NextRequest, { params }: { params: { userId: st
   try {
     await connectDB();
     const body = await req.json();
+    const { assignmentId, ...updates } = body;
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    if (!updates || Object.keys(updates).length === 0) {
+      return NextResponse.json({ error: "No updates provided" }, { status: 400 });
+    }
 
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
+    const filter = assignmentId
+      ? {
+          _id: assignmentId,
+          user_id: params.userId,
+        }
+      : (() => {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
 
-    const updated = await TaskAssignment.findOneAndUpdate(
-      {
-        user_id: params.userId,
-        date: { $gte: today, $lt: tomorrow },
-      },
-      body,
-      { new: true },
-    );
+          const tomorrow = new Date(today);
+          tomorrow.setDate(today.getDate() + 1);
+
+          return {
+            user_id: params.userId,
+            date: { $gte: today, $lt: tomorrow },
+          };
+        })();
+
+    const updated = await TaskAssignment.findOneAndUpdate(filter, { $set: updates }, { new: true });
 
     if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
 

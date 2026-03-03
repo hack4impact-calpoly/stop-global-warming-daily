@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Text, VStack } from "@chakra-ui/react";
-import TaskCard from "@/components/TaskCard";
+import SwipeableTaskCard from "@/components/SwipeableTaskCard";
 
 type TaskAssignmentResponse = {
   _id: string;
@@ -111,17 +111,54 @@ export default function WeeklyTaskList({ userId, referenceDate }: WeeklyTaskList
     fetchWeekTasks();
   }, [referenceDate, userId]);
 
+  const updateCompletion = async (assignmentId: string, completed: boolean) => {
+    if (!userId) return;
+    const previousTasks = tasks;
+
+    setTasks((prev) => prev.map((task) => (task.assignmentId === assignmentId ? { ...task, completed } : task)));
+
+    try {
+      const res = await fetch(`/api/taskAssignment/${userId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          assignmentId,
+          isComplete: completed,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to update weekly task completion");
+    } catch (error) {
+      console.error("Failed to update weekly completion:", error);
+      setTasks(previousTasks);
+    }
+  };
+
+  const markComplete = (assignmentId: string) => {
+    const task = tasks.find((entry) => entry.assignmentId === assignmentId);
+    if (!task || task.completed) return;
+    updateCompletion(assignmentId, true);
+  };
+
+  const markIncomplete = (assignmentId: string) => {
+    const task = tasks.find((entry) => entry.assignmentId === assignmentId);
+    if (!task || !task.completed) return;
+    updateCompletion(assignmentId, false);
+  };
+
   return (
     <VStack align="stretch" w="full" pt={2}>
       {tasks.length > 0 ? (
         tasks.map((task) => (
-          <TaskCard
+          <SwipeableTaskCard
             key={task.assignmentId}
             date={task.date}
             title={task.title}
             description={task.description}
             minEstimate={task.minEstimate}
             completed={task.completed}
+            onSwipeRight={() => markComplete(task.assignmentId)}
+            onSwipeLeft={() => markIncomplete(task.assignmentId)}
           />
         ))
       ) : (
