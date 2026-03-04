@@ -4,6 +4,7 @@ import MonthlyCalendar from "@/components/MonthlyCalendar";
 import React from "react";
 import CalendarSubHeader from "@/components/CalendarSubHeader";
 import CalendarSwitchButton from "@/components/CalendarSwitchButton";
+import TaskList from "@/components/TaskList";
 import { useState, useEffect } from "react";
 import { IUsers } from "@/database/userSchema";
 import { useUser } from "@clerk/nextjs";
@@ -28,16 +29,20 @@ export default function Page() {
   useEffect(() => {
     const getUser = async () => {
       if (user && isSignedIn) {
-        let res = await fetch(`/api/user/email/${user.emailAddresses[0].emailAddress}`, {
+        const email = encodeURIComponent(user.emailAddresses[0].emailAddress);
+        const res = await fetch(`/api/user/email/${email}`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
 
-        if (res) {
-          const userObj = await res.json();
-          setUserData(userObj);
-          console.log("user is signed in!");
+        if (!res.ok) {
+          setUserData(null);
+          return;
         }
+
+        const userObj: IUsers = await res.json();
+        setUserData(userObj);
+        console.log("user is signed in!");
       }
     };
     if (!isLoaded) {
@@ -47,12 +52,25 @@ export default function Page() {
     getUser();
   }, [isLoaded, isSignedIn, user]);
 
+  const formatDayLabel = (date: Date) => {
+    const day = date.getDate();
+    const suffix =
+      day % 10 === 1 && day !== 11
+        ? "st"
+        : day % 10 === 2 && day !== 12
+          ? "nd"
+          : day % 10 === 3 && day !== 13
+            ? "rd"
+            : "th";
+    return `${date.toLocaleString("en-US", { month: "long" })} ${day}${suffix}`;
+  };
+
   const showCalendar = (selectCalendar: string) => {
     if (selectCalendar === "D")
       return (
         <>
-          <CalendarSubHeader date="January 5th"></CalendarSubHeader>
-          <Box></Box>
+          <CalendarSubHeader date={formatDayLabel(new Date())}></CalendarSubHeader>
+          <TaskList userId={userData ? String(userData._id) : undefined} />
         </>
       );
     else if (selectCalendar === "W")
@@ -65,7 +83,9 @@ export default function Page() {
     else
       return (
         <>
-          <CalendarSubHeader date="January 2026"></CalendarSubHeader>
+          <CalendarSubHeader
+            date={new Date().toLocaleString("en-US", { month: "long", year: "numeric" })}
+          ></CalendarSubHeader>
           <MonthlyCalendar></MonthlyCalendar>
         </>
       );

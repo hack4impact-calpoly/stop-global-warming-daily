@@ -34,16 +34,20 @@ export default function Page() {
   useEffect(() => {
     const getUser = async () => {
       if (user && isSignedIn) {
-        let res = await fetch(`/api/user/email/${user.emailAddresses[0].emailAddress}`, {
+        const email = encodeURIComponent(user.emailAddresses[0].emailAddress);
+        const res = await fetch(`/api/user/email/${email}`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
 
-        if (res) {
-          const userObj = await res.json();
-          setUserData(userObj);
-          console.log("user is signed in!");
+        if (!res.ok) {
+          setUserData(null);
+          return;
         }
+
+        const userObj: IUsers = await res.json();
+        setUserData(userObj);
+        console.log("user is signed in!");
       }
     };
     if (!isLoaded) {

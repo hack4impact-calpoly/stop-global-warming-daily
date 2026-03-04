@@ -1,9 +1,10 @@
 "use client";
-import { useState } from "react";
-import { VStack } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import { Text, VStack } from "@chakra-ui/react";
 import SwipeableTaskCard from "@/components/SwipeableTaskCard";
 
 export interface Task {
+  assignmentId: string;
   id: string;
   date: Date;
   title: string;
@@ -12,81 +13,131 @@ export interface Task {
   completed: boolean;
 }
 
-const INITIAL_TASKS: Task[] = [
-  {
-    id: "1",
-    date: new Date(2025, 0, 4),
-    title: "Sort Recycling Bin",
-    description: "Separate paper, plastic, and glass into the correct recycling bins before collection day.",
-    minEstimate: 15,
-    completed: true,
-  },
-  {
-    id: "2",
-    date: new Date(2025, 0, 5),
-    title: "Switch to LED Bulbs",
-    description: "Replace old incandescent bulbs in the kitchen and living room with energy-efficient LEDs.",
-    minEstimate: 20,
-    completed: false,
-  },
-  {
-    id: "3",
-    date: new Date(2025, 0, 6),
-    title: "Plan a Meatless Meal",
-    description: "Cook one plant-based dinner this week to reduce your dietary carbon footprint.",
-    minEstimate: 20,
-    completed: false,
-  },
-  {
-    id: "4",
-    date: new Date(2025, 0, 7),
-    title: "Take Public Transit",
-    description: "Swap your usual car commute for the bus or train and track the emissions you saved.",
-    minEstimate: 10,
-    completed: false,
-  },
-  {
-    id: "5",
-    date: new Date(2025, 0, 8),
-    title: "Unplug Idle Electronics",
-    description: "Walk through your home and unplug chargers, TVs, and appliances that aren't in use.",
-    minEstimate: 10,
-    completed: false,
-  },
-  {
-    id: "6",
-    date: new Date(2025, 0, 9),
-    title: "Bring a Reusable Bag",
-    description: "Grab your reusable shopping bag before heading to the grocery store today.",
-    minEstimate: 5,
-    completed: false,
-  },
-  {
-    id: "7",
-    date: new Date(2025, 0, 10),
-    title: "Take a Shorter Shower",
-    description: "Try cutting your shower time by 2 minutes to conserve water and reduce energy use.",
-    minEstimate: 5,
-    completed: false,
-  },
-];
+type TaskAssignmentResponse = {
+  _id: string;
+  task_id: string | { _id: string };
+  date: string;
+  isComplete: boolean;
+};
 
-export default function TaskList() {
-  const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS);
+type TaskResponse = {
+  _id: string;
+  title: string;
+  description: string;
+  time: number;
+};
+
+type TaskListProps = {
+  userId?: string;
+  showHeader?: boolean;
+};
+
+export default function TaskList({ userId, showHeader = true }: TaskListProps) {
+  const [task, setTask] = useState<Task | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const getTaskIdFromAssignment = (assignment: TaskAssignmentResponse) => {
+      if (typeof assignment.task_id === "string") return assignment.task_id;
+      return assignment.task_id?._id;
+    };
+
+    const fetchTask = async () => {
+      if (!userId) {
+        setTask(null);
+        return;
+      }
+
+      setIsLoading(true);
+
+      try {
+        const assignmentRes = await fetch(`/api/taskAssignment/${userId}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!assignmentRes.ok) throw new Error("Failed to fetch task assignment");
+
+        const assignments: TaskAssignmentResponse[] = await assignmentRes.json();
+
+        if (assignments.length === 0) {
+          setTask(null);
+          return;
+        }
+
+        const assignment = assignments[0];
+        const taskId = getTaskIdFromAssignment(assignment);
+
+        if (!taskId) throw new Error("Task assignment has no task id");
+
+        const taskRes = await fetch(`/api/task/${taskId}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!taskRes.ok) throw new Error("Failed to fetch task");
+
+        const taskData: TaskResponse = await taskRes.json();
+
+        setTask({
+          assignmentId: assignment._id,
+          id: taskData._id,
+          date: new Date(assignment.date),
+          title: taskData.title,
+          description: taskData.description,
+          minEstimate: taskData.time,
+          completed: assignment.isComplete,
+        });
+      } catch (error) {
+        console.error("Failed to load daily task:", error);
+        setTask(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTask();
+  }, [userId]);
+
+  const updateCompletion = async (completed: boolean) => {
+    if (!task || !userId || task.completed === completed) return;
+
+    const previousCompleted = task.completed;
+    setTask((prev) => (prev ? { ...prev, completed } : prev));
+
+    try {
+      const res = await fetch(`/api/taskAssignment/${userId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isComplete: completed }),
+      });
+
+      if (!res.ok) throw new Error("Failed to update task completion");
+    } catch (error) {
+      console.error("Failed to update completion:", error);
+      setTask((prev) => (prev ? { ...prev, completed: previousCompleted } : prev));
+    }
+  };
 
   const markComplete = (id: string) => {
-    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, completed: true } : t)));
+    if (task?.id !== id) return;
+    updateCompletion(true);
   };
 
   const markIncomplete = (id: string) => {
-    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, completed: false } : t)));
+    if (task?.id !== id) return;
+    updateCompletion(false);
   };
 
   return (
-    <VStack w="full" paddingX="20px" paddingBottom="20px" gap={0}>
-      {tasks.map((task) => (
+    <VStack w="full" paddingX="20px" paddingBottom="20px" gap={0} alignItems="stretch">
+      {showHeader && (
+        <Text fontSize="sm" fontWeight="semibold" color="gray.600" pb={3}>
+          Daily Task
+        </Text>
+      )}
+      {task ? (
         <SwipeableTaskCard
-          key={task.id}
           date={task.date}
           title={task.title}
           description={task.description}
@@ -95,7 +146,11 @@ export default function TaskList() {
           onSwipeRight={() => markComplete(task.id)}
           onSwipeLeft={() => markIncomplete(task.id)}
         />
-      ))}
+      ) : (
+        <Text color="gray.500" fontSize="sm">
+          {isLoading ? "Loading task..." : "No task assigned for today."}
+        </Text>
+      )}
     </VStack>
   );
 }

@@ -7,7 +7,8 @@ export async function GET(req: NextRequest, { params }: { params: { email: strin
   try {
     await connectDB();
 
-    const user = await User.find({ email: params.email });
+    const email = decodeURIComponent(params.email).toLowerCase();
+    const user = await User.findOne({ email });
 
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
