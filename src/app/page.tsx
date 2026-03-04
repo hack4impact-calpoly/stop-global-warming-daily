@@ -53,9 +53,9 @@ export default function Home() {
 
   return (
     <main>
-      <Box display={"flex"} alignItems={"center"} justifyContent={"center"}>
-        <VStack maxW={400} w={"full"} gap={0}>
-          <HStack w={"full"} justifyContent={"space-between"} padding={"20px"}>
+      <Box display={"flex"} justifyContent={"center"}>
+        <VStack maxW="400px" align="stretch" w="full" gap={2} px={5}>
+          <HStack w={"full"} justifyContent={"space-between"}>
             <Text fontWeight={"semibold"} fontSize={32}>
               Hi, Ethan!
             </Text>

@@ -4,8 +4,13 @@ import { Box, VStack } from "@chakra-ui/react";
 import CalendarSubHeader from "@/components/CalendarSubHeader";
 import TaskCardExpanded from "@/components/TaskCardExpanded";
 import { INITIAL_TASKS } from "@/data/dummyTasks"; //dummy data
+import { IUsers } from "@/database/userSchema";
 
-export default function DayView() {
+type DailyViewProps = {
+  userData: IUsers | null;
+};
+
+export default function DayView({ userData }: DailyViewProps) {
   const fifthTask = INITIAL_TASKS[4];
   return (
     <VStack>

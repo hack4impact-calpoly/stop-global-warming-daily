@@ -1,5 +1,5 @@
 import { Box, VStack, Text, HStack, IconButton } from "@chakra-ui/react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 
 type CalendarSubHeaderProps = {
   date: string;
@@ -8,16 +8,16 @@ type CalendarSubHeaderProps = {
 export default function CalendarSubHeader({ date }: CalendarSubHeaderProps) {
   return (
     <HStack w={"full"} h={"29px"} justify="space-between" align="center">
-      <Text fontSize="24px" fontWeight="semibold" color="black">
+      <Text fontSize="2xl" fontWeight={"semibold"}>
         {date}
       </Text>
       <HStack gap={2}>
-        <IconButton variant="ghost" size={"xs"}>
-          <FaChevronLeft />
+        <IconButton variant="ghost" size="md">
+          <LuChevronLeft />
         </IconButton>
 
-        <IconButton variant="ghost" size={"xs"}>
-          <FaChevronRight />
+        <IconButton variant="ghost" size="md" justifyContent="flex-end">
+          <LuChevronRight />
         </IconButton>
       </HStack>
     </HStack>
