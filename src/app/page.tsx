@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { IUsers } from "@/database/userSchema";
 import { useRouter } from "next/navigation";
+import StreakCard from "@/components/StreakCard";
 
 export default function Home() {
   const { isSignedIn, user, isLoaded } = useUser();
@@ -64,7 +65,7 @@ export default function Home() {
             </Link>
           </HStack>
           {/* Progress Ring */}
-          <VStack w={"full"} gap={5} padding={"20px"}>
+          <VStack w={"full"} gap={5} py={"20px"}>
             <HStack w={"full"} justifyContent={"space-between"}>
               <IconButton area-label="Previous Progress Ring" variant={"ghost"}>
                 <LuChevronLeft />
@@ -76,7 +77,7 @@ export default function Home() {
                 <LuChevronRight />
               </IconButton>
             </HStack>
-            <ProgressRing percent={70} isClockwise={false} />
+            <StreakCard></StreakCard>
           </VStack>
           {/* Tasks */}
           <TaskList userId={userData ? String(userData._id) : undefined} />
