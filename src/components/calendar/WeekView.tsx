@@ -4,6 +4,7 @@ import { Box, VStack } from "@chakra-ui/react";
 import CalendarSubHeader from "@/components/CalendarSubHeader";
 import TaskList from "../TaskList";
 import { IUsers } from "@/database/userSchema";
+import WeeklyTaskList from "../WeeklyTaskList";
 
 type WeekViewProps = {
   userData: IUsers | null;
@@ -12,8 +13,7 @@ type WeekViewProps = {
 export default function WeekView({ userData }: WeekViewProps) {
   return (
     <VStack>
-      <CalendarSubHeader date="January 4-10"></CalendarSubHeader>
-      <TaskList userId={userData ? String(userData._id) : undefined} showHeader={false} />
+      <WeeklyTaskList referenceDate={new Date()} userId={userData ? String(userData._id) : undefined} />
     </VStack>
   );
 }

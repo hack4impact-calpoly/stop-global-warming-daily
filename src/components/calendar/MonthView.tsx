@@ -8,7 +8,6 @@ import { JANUARY_2025 } from "@/data/dummyMonthData"; //dummy data
 export default function MonthView() {
   return (
     <VStack>
-      <CalendarSubHeader date="January 2026"></CalendarSubHeader>
       <Box>Progress Bar</Box>
       <MonthlyCalendar days={JANUARY_2025} />
     </VStack>

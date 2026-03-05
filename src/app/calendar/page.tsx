@@ -6,9 +6,59 @@ import { IUsers } from "@/database/userSchema";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { DayView, WeekView, MonthView } from "@/components/calendar";
+import CalendarSubHeader from "@/components/CalendarSubHeader";
 import CalendarSwitchButton from "@/components/CalendarSwitchButton";
 
+const addDays = (date: Date, amount: number) => {
+  const nextDate = new Date(date);
+  nextDate.setDate(nextDate.getDate() + amount);
+  return nextDate;
+};
+
+const addMonths = (date: Date, amount: number) => {
+  const nextDate = new Date(date);
+  nextDate.setMonth(nextDate.getMonth() + amount);
+  return nextDate;
+};
+
+const getWeekStart = (date: Date) => {
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() - start.getDay());
+  return start;
+};
+
+const getDaySuffix = (day: number) => {
+  if (day % 100 >= 11 && day % 100 <= 13) return "th";
+  if (day % 10 === 1) return "st";
+  if (day % 10 === 2) return "nd";
+  if (day % 10 === 3) return "rd";
+  return "th";
+};
+
+const formatSingleDayLabel = (date: Date) => {
+  return `${date.toLocaleString("en-US", { month: "long" })} ${date.getDate()}${getDaySuffix(date.getDate())}`;
+};
+
+const formatWeekRangeLabel = (date: Date) => {
+  const start = getWeekStart(date);
+  const end = addDays(start, 6);
+  const startMonth = start.toLocaleString("en-US", { month: "long" });
+  const endMonth = end.toLocaleString("en-US", { month: "long" });
+
+  if (startMonth === endMonth) {
+    return `${startMonth} ${start.getDate()}-${end.getDate()}`;
+  }
+
+  return `${startMonth} ${start.getDate()}-${endMonth} ${end.getDate()}`;
+};
+
+const formatMonthLabel = (date: Date) => {
+  return date.toLocaleString("en-US", { month: "long", year: "numeric" });
+};
+
 export default function Page() {
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   //use localStorage to save selected tab
   const [view, setView] = useState<"D" | "W" | "M">("D");
 
@@ -53,9 +103,8 @@ export default function Page() {
           return;
         }
 
-        const userObj: IUsers = await res.json();
-        setUserData(userObj);
-        console.log("user is signed in!");
+        const userObj = await res.json();
+        setUserData(Array.isArray(userObj) ? (userObj[0] ?? null) : userObj);
       }
     };
     if (!isLoaded) {
@@ -79,9 +128,39 @@ export default function Page() {
   };
 
   const showCalendar = (selectCalendar: string) => {
-    if (selectCalendar === "D") return <DayView userData={userData} />;
-    if (selectCalendar === "W") return <WeekView userData={userData} />;
-    return <MonthView />;
+    if (selectCalendar === "D")
+      return (
+        <>
+          <CalendarSubHeader
+            date={formatSingleDayLabel(selectedDate)}
+            onPrevious={() => setSelectedDate((prev) => addDays(prev, -1))}
+            onNext={() => setSelectedDate((prev) => addDays(prev, 1))}
+          ></CalendarSubHeader>
+          <DayView userData={userData} />
+        </>
+      );
+    else if (selectCalendar === "W")
+      return (
+        <>
+          <CalendarSubHeader
+            date={formatWeekRangeLabel(selectedDate)}
+            onPrevious={() => setSelectedDate((prev) => addDays(prev, -7))}
+            onNext={() => setSelectedDate((prev) => addDays(prev, 7))}
+          ></CalendarSubHeader>
+          <WeekView userData={userData} />
+        </>
+      );
+    else
+      return (
+        <>
+          <CalendarSubHeader
+            date={formatMonthLabel(selectedDate)}
+            onPrevious={() => setSelectedDate((prev) => addMonths(prev, -1))}
+            onNext={() => setSelectedDate((prev) => addMonths(prev, 1))}
+          ></CalendarSubHeader>
+          <MonthView />
+        </>
+      );
   };
 
   return (
