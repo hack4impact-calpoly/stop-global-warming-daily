@@ -86,7 +86,7 @@ export default function Page() {
 
   return (
     <Box display={"flex"} justifyContent={"center"}>
-      <VStack maxW="400px" align="stretch" w="full" gap={2} px={5}>
+      <VStack maxW="400px" align="stretch" w="full" gap={2} p={5}>
         <HStack w="full" justify="space-between" align="center">
           <Text fontSize="4xl" letterSpacing="-0.05em" whiteSpace="nowrap" fontWeight={"semibold"}>
             My Calendar

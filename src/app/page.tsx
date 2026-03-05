@@ -54,10 +54,10 @@ export default function Home() {
   return (
     <main>
       <Box display={"flex"} justifyContent={"center"}>
-        <VStack maxW="400px" align="stretch" w="full" gap={2} px={5}>
+        <VStack maxW="400px" align="stretch" w="full" gap={2} p={5}>
           <HStack w={"full"} justifyContent={"space-between"}>
-            <Text fontWeight={"semibold"} fontSize={32}>
-              Hi, Ethan!
+            <Text fontWeight={"semibold"} fontSize="4xl">
+              Hi{userData ? ", " + String(userData.name.split(" ")[0]) : ""}!
             </Text>
             <Link href="/notifications" style={{ display: "flex", cursor: "pointer" }}>
               <LuBell size={24} />
