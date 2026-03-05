@@ -2,6 +2,28 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/database/db";
 import TaskAssignment from "@/database/taskAssignmentSchema";
 
+const getWeekStart = (date: Date) => {
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() - start.getDay());
+  return start;
+};
+
+const getDateWindow = (baseDate: Date, range: string) => {
+  if (range === "week") {
+    const startDate = getWeekStart(baseDate);
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 7);
+    return { startDate, endDate };
+  }
+
+  const startDate = new Date(baseDate);
+  startDate.setHours(0, 0, 0, 0);
+  const endDate = new Date(startDate);
+  endDate.setDate(startDate.getDate() + 1);
+  return { startDate, endDate };
+};
+
 // get user's assignment by date, default is "today"
 export async function GET(req: NextRequest, { params }: { params: { userId: string } }) {
   try {
@@ -9,17 +31,17 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 
     const { searchParams } = new URL(req.url);
     const dateParam = searchParams.get("date");
-
-    const startDate = dateParam ? new Date(dateParam) : new Date();
-    startDate.setHours(0, 0, 0, 0);
-
-    const endDate = new Date(startDate);
-    endDate.setDate(startDate.getDate() + 1);
+    const range = searchParams.get("range") ?? "day";
+    const baseDate = dateParam ? new Date(dateParam) : new Date();
+    if (Number.isNaN(baseDate.getTime())) {
+      return NextResponse.json({ error: "Invalid date parameter" }, { status: 400 });
+    }
+    const { startDate, endDate } = getDateWindow(baseDate, range);
 
     const taskAssignment = await TaskAssignment.find({
       user_id: params.userId,
       date: { $gte: startDate, $lt: endDate },
-    });
+    }).sort({ date: 1 });
 
     return NextResponse.json(taskAssignment, { status: 200 });
   } catch (err) {
@@ -31,21 +53,31 @@ export async function PATCH(req: NextRequest, { params }: { params: { userId: st
   try {
     await connectDB();
     const body = await req.json();
+    const { assignmentId, ...updates } = body;
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    if (!updates || Object.keys(updates).length === 0) {
+      return NextResponse.json({ error: "No updates provided" }, { status: 400 });
+    }
 
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
+    const filter = assignmentId
+      ? {
+          _id: assignmentId,
+          user_id: params.userId,
+        }
+      : (() => {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
 
-    const updated = await TaskAssignment.findOneAndUpdate(
-      {
-        user_id: params.userId,
-        date: { $gte: today, $lt: tomorrow },
-      },
-      body,
-      { new: true },
-    );
+          const tomorrow = new Date(today);
+          tomorrow.setDate(today.getDate() + 1);
+
+          return {
+            user_id: params.userId,
+            date: { $gte: today, $lt: tomorrow },
+          };
+        })();
+
+    const updated = await TaskAssignment.findOneAndUpdate(filter, { $set: updates }, { new: true });
 
     if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
 

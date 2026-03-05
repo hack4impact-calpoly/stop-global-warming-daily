@@ -14,7 +14,6 @@ export default function DayView({ userData }: DailyViewProps) {
   const fifthTask = INITIAL_TASKS[4];
   return (
     <VStack>
-      <CalendarSubHeader date="January 5th"></CalendarSubHeader>
       <Box>Progress Bar</Box>
 
       {fifthTask && (
