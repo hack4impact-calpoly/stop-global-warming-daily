@@ -1,4 +1,5 @@
-import { Box, Text, ProgressCircle, AbsoluteCenter } from "@chakra-ui/react";
+import { Box, Text, ProgressCircle, AbsoluteCenter, Icon } from "@chakra-ui/react";
+import { FaFire } from "react-icons/fa";
 
 //// Custom progress ring component configurable with size, thickness, and direction of progress indicator
 export default function ProgressRing({ percent = 0, isClockwise = true, size = "270px", thickness = "30px" }) {
@@ -20,9 +21,7 @@ export default function ProgressRing({ percent = 0, isClockwise = true, size = "
         <ProgressCircle.Range strokeLinecap="round" />
       </ProgressCircle.Circle>
       <AbsoluteCenter>
-        <ProgressCircle.ValueText fontSize="6xl" fontWeight="bold">
-          {clampedPercent}%
-        </ProgressCircle.ValueText>
+        <Icon as={FaFire} boxSize={16} color="cyan.600" />
       </AbsoluteCenter>
     </ProgressCircle.Root>
   );
