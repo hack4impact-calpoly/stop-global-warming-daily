@@ -84,20 +84,24 @@ export async function PATCH(req: NextRequest, { params }: { params: { userId: st
 
     if (updated.isComplete === true) {
       const user = await User.findById(params.userId);
+      const today = new Date();
 
       if (user) {
         const todayStr = today.toDateString();
 
-        const alreadyCompleted = user.completedDates.some((d: Date) => new Date(d).toDateString() === todayStr);
+        const completedDates = user.completedDates || [];
+
+        const alreadyCompleted = completedDates.some((d: Date) => new Date(d).toDateString() === todayStr);
 
         if (!alreadyCompleted) {
-          user.completedDates.push(today);
-          user.streak += 1;
+          completedDates.push(today);
+          user.completedDates = completedDates;
+          user.streak = (user.streak || 0) + 1;
+
           await user.save();
         }
       }
     }
-
     return NextResponse.json(updated);
   } catch {
     return NextResponse.json({ error: "Update failed" }, { status: 400 });
