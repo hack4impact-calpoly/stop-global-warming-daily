@@ -9,14 +9,21 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { email, name, role } = body;
 
+    if (!email || !name) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
     const newUser = await User.create({
       email,
       name,
-      role,
+      role: role ?? "user",
+      streak: 0,
+      completedDates: [],
     });
 
     return NextResponse.json(newUser, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: "Failed to create user" }, { status: 500 });
+    console.error("POST /api/user error:", error);
+    return NextResponse.json({ error: String(error) }, { status: 500 });
   }
 }
