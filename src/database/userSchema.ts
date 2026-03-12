@@ -10,6 +10,8 @@ export interface IUsers {
   email: string;
   name: string;
   role: Role;
+  streak: number;
+  completedDates: Date[];
 }
 
 const UserSchema = new Schema(
@@ -21,6 +23,16 @@ const UserSchema = new Schema(
       enum: Object.values(Role),
       required: true,
       default: Role.user,
+    },
+
+    streak: {
+      type: Number,
+      default: 0,
+    },
+
+    completedDates: {
+      type: [Date],
+      default: [],
     },
   },
   { timestamps: true },

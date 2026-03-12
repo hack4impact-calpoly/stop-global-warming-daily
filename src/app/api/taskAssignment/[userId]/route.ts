@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/database/db";
 import TaskAssignment from "@/database/taskAssignmentSchema";
+import User from "@/database/userSchema";
 
 const getWeekStart = (date: Date) => {
   const start = new Date(date);
@@ -81,6 +82,26 @@ export async function PATCH(req: NextRequest, { params }: { params: { userId: st
 
     if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
+    if (updated.isComplete === true) {
+      const user = await User.findById(params.userId);
+      const today = new Date();
+
+      if (user) {
+        const todayStr = today.toDateString();
+
+        const completedDates = user.completedDates || [];
+
+        const alreadyCompleted = completedDates.some((d: Date) => new Date(d).toDateString() === todayStr);
+
+        if (!alreadyCompleted) {
+          completedDates.push(today);
+          user.completedDates = completedDates;
+          user.streak = (user.streak || 0) + 1;
+
+          await user.save();
+        }
+      }
+    }
     return NextResponse.json(updated);
   } catch {
     return NextResponse.json({ error: "Update failed" }, { status: 400 });

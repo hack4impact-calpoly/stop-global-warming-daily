@@ -39,9 +39,32 @@ export default function Home() {
           setUserData(null);
           return;
         }
-
         const userObj: IUsers = await res.json();
         setUserData(userObj);
+
+        // check if user completed yesterday
+        const completedDates = userObj.completedDates ?? [];
+
+        if (completedDates.length > 0) {
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          yesterday.setHours(0, 0, 0, 0);
+
+          const didYesterday = completedDates.some((d) => {
+            const date = new Date(d);
+            date.setHours(0, 0, 0, 0);
+            return date.getTime() === yesterday.getTime();
+          });
+
+          if (!didYesterday && userObj.streak !== 0) {
+            await fetch(`/api/user/${userObj._id}`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ streak: 0 }),
+            });
+          }
+        }
+
         console.log("user is signed in!");
       }
     };
