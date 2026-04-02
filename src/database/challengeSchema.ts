@@ -6,6 +6,7 @@ export type IChallenges = {
   color: string;
   task_ids: Types.ObjectId[];
   users: Types.ObjectId[];
+  isActive: boolean;
 };
 
 const challengeSchema = new Schema(
@@ -33,6 +34,11 @@ const challengeSchema = new Schema(
         required: true,
       },
     ],
+
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     collection: "devchallenges",
