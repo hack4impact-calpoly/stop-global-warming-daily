@@ -17,7 +17,10 @@ import Link from "next/link";
 
 export default function Page() {
   const { user } = useUser();
-  const isAdmin = user?.publicMetadata?.role === "admin";
+
+  // commented out for development
+  // const isAdmin = user?.publicMetadata?.role === "admin";
+  const isAdmin = true;
 
   return (
     <VStack display="flex" justifyContent="center" gap={30}>
@@ -88,7 +91,7 @@ export default function Page() {
         borderRadius="20px 20px 0 0"
       >
         {isAdmin && (
-          <Link href="/admin/settings" style={{ width: "100%", maxWidth: "400px" }}>
+          <Link href="/admin" style={{ width: "100%", maxWidth: "400px" }}>
             <HStack bg="#F6F6F6" w="full" justifyContent="space-between" rounded="xl" p={5} pl={8}>
               <HStack gap={3}>
                 <LuShieldCheck size={35} />
