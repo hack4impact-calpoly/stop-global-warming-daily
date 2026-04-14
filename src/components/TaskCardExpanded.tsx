@@ -26,7 +26,7 @@ export default function TaskCardExpanded({
       w="100%"
       gap={0}
       align="stretch"
-      boxShadow="0px 1px 8px 0px rgba(89, 91, 98, 0.10)"
+      boxShadow="0px 1px 8px rgba(89, 91, 98, 0.1)"
     >
       <VStack align="flex-start" gap={4} flex={1}>
         <VStack align="flex-start" gap={2}>
