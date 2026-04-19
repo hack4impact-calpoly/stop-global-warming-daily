@@ -3,7 +3,12 @@
 import Link from "next/link";
 import { Box, Text, VStack, HStack, Input, IconButton } from "@chakra-ui/react";
 import { LuChevronLeft, LuSearch, LuPlus } from "react-icons/lu";
-
+import AdminChallengeCard from "@/components/AdminChallengeCard";
+const dummyChallengeForCard = {
+  title: "Spring Challenge",
+  description: "Description of challenge. We can have up to two lines of description.",
+  isActive: true,
+};
 export default function ManageChallengePage() {
   return (
     <Box display="flex" justifyContent="center" minH="100vh">
@@ -33,6 +38,13 @@ export default function ManageChallengePage() {
               <LuSearch />
             </Box>
           </Box>
+          <VStack>
+            <AdminChallengeCard
+              title={dummyChallengeForCard.title}
+              description={dummyChallengeForCard.description}
+              isActive={dummyChallengeForCard.isActive}
+            />
+          </VStack>
         </VStack>
       </Box>
 

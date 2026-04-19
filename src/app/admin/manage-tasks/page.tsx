@@ -3,7 +3,14 @@
 import Link from "next/link";
 import { Box, Text, VStack, HStack, Input, IconButton } from "@chakra-ui/react";
 import { LuChevronLeft, LuSearch, LuPlus } from "react-icons/lu";
-
+import { initialize } from "next/dist/server/lib/render-server";
+import AdminTaskCard from "@/components/AdminTaskCard";
+const dummyTaskForCard = {
+  title: "Task Name",
+  description: "Description of task. We can have up to two lines of description.",
+  minEstimate: 20,
+  availability: "Daily",
+};
 export default function ManageTasksPage() {
   return (
     <Box display="flex" justifyContent="center" minH="100vh">
@@ -33,6 +40,14 @@ export default function ManageTasksPage() {
               <LuSearch />
             </Box>
           </Box>
+          <VStack>
+            <AdminTaskCard
+              title={dummyTaskForCard.title}
+              description={dummyTaskForCard.description}
+              minEstimate={dummyTaskForCard.minEstimate}
+              availability={dummyTaskForCard.availability}
+            />
+          </VStack>
         </VStack>
       </Box>
 

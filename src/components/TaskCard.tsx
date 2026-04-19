@@ -15,7 +15,15 @@ interface TaskCardProps {
 export default function TaskCard({ date, title, description, minEstimate, completed }: TaskCardProps) {
   return (
     <Collapsible.Root>
-      <VStack bg="white" p={3} borderRadius="lg" w="100%" gap={0} align="stretch">
+      <VStack
+        bg="white"
+        p={3}
+        borderRadius="lg"
+        w="100%"
+        gap={0}
+        align="stretch"
+        boxShadow={"0px 1px 8px rgba(89, 91, 98, 0.1)"}
+      >
         {/* Header */}
         <HStack align="flex-start" gap={4}>
           <BoxedDate date={date} />
