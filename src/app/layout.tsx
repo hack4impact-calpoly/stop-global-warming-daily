@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Provider } from "@/components/ui/provider";
 import { ClerkProvider } from "@clerk/nextjs";
-import Navbar from "@/components/Navbar";
+import AppShell from "@/components/AppShell";
 import "./globals.css";
 
 //! Update metadata to match your project
@@ -16,11 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <html lang="en" suppressHydrationWarning>
         <body>
           <Provider>
-            {/* paddingBottom prevents content from hiding behind fixed navbar */}
-            <div style={{ minHeight: "100vh", paddingBottom: "120px" }}>
-              {children}
-              <Navbar />
-            </div>
+            <AppShell>{children}</AppShell>
           </Provider>
         </body>
       </html>
