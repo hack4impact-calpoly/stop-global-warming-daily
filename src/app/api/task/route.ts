@@ -1,6 +1,21 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import TaskModel from "@/database/taskSchema";
 import connectDB from "@/database/db";
+
+export async function GET() {
+  try {
+    await connectDB();
+
+    const tasks = await TaskModel.find().sort({ _id: -1 });
+
+    return NextResponse.json(tasks);
+  } catch (error) {
+    console.error("GET /api/task error:", error);
+    return NextResponse.json({ error: "Failed to fetch tasks" }, { status: 500 });
+  }
+}
 
 export async function POST(req: Request) {
   try {

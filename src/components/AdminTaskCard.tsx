@@ -1,15 +1,17 @@
 import Divider from "./Divider";
-import { HStack, Text, VStack, Collapsible, Menu, Portal, IconButton, Box } from "@chakra-ui/react";
+import { Box, Collapsible, HStack, Menu, Portal, Text, VStack } from "@chakra-ui/react";
 import { LuEllipsisVertical } from "react-icons/lu";
 
 interface AdminTaskCardProps {
-  title: String; // Title of the task
-  description: String; // Brief description for the task
-  minEstimate: Number; // Estimated number of minutes to complete the task
-  availability: String; // Avaiable for (Daily Tasks) or (Spring Challenge) or (SLO Challenge)
+  title: string;
+  description: string;
+  minEstimate?: number | null;
+  availability: string;
 }
 
 export default function AdminTaskCard({ title, description, minEstimate, availability }: AdminTaskCardProps) {
+  const estimateLabel = typeof minEstimate === "number" ? `~${minEstimate} min` : "Time TBD";
+
   return (
     <Collapsible.Root>
       <VStack
@@ -24,14 +26,14 @@ export default function AdminTaskCard({ title, description, minEstimate, availab
         {/* Header */}
         <HStack h="100%" w="100%" align="flex-start" gap={0} alignItems={"flex-start"}>
           <Collapsible.Trigger transition="transform 0.2s">
-            <VStack align="flex-start" gap={0} flex={1}>
+            <VStack align="flex-start" gap={0} flex={1} w="100%">
               <HStack align="flex-start" justify="space-between" w="100%">
                 <VStack align="flex-start" gap={0}>
                   <Text fontSize="lg" fontWeight="semibold">
                     {title}
                   </Text>
                   <Divider>
-                    <Text fontSize="sm">{`~${minEstimate} min`}</Text>
+                    <Text fontSize="sm">{estimateLabel}</Text>
                     <Text fontSize="sm">{availability}</Text>
                   </Divider>
                 </VStack>
@@ -40,6 +42,7 @@ export default function AdminTaskCard({ title, description, minEstimate, availab
                 fontSize="sm"
                 w="100%"
                 textAlign={"start"}
+                color="gray.600"
                 css={{ WebkitLineClamp: 2, display: "-webkit-box", WebkitBoxOrient: "vertical" }}
               >
                 {description}
@@ -63,7 +66,11 @@ export default function AdminTaskCard({ title, description, minEstimate, availab
           </Menu.Root>
         </HStack>
         {/* Full Description */}
-        <Collapsible.Content></Collapsible.Content>
+        <Collapsible.Content>
+          <Text color="gray.600" fontSize="sm" pt={3}>
+            {description}
+          </Text>
+        </Collapsible.Content>
       </VStack>
     </Collapsible.Root>
   );
