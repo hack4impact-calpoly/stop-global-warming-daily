@@ -1,10 +1,10 @@
-import { HStack, Text, VStack, Collapsible, Menu, Portal, IconButton, Box } from "@chakra-ui/react";
+import { Box, Collapsible, HStack, Menu, Portal, Text, VStack } from "@chakra-ui/react";
 import { LuEllipsisVertical } from "react-icons/lu";
 
 interface AdminChallengeCardProps {
-  title: String; // Title of the challenge
-  description: String; // Description for the challenge
-  isActive: boolean; // flag to indicate if challange is active
+  title: string;
+  description: string;
+  isActive: boolean;
 }
 
 export default function AdminChallengeCard({ title, description, isActive }: AdminChallengeCardProps) {
@@ -22,7 +22,7 @@ export default function AdminChallengeCard({ title, description, isActive }: Adm
         {/* Header */}
         <HStack h="100%" w="100%" align="flex-start" gap={0} alignItems={"flex-start"}>
           <Collapsible.Trigger transition="transform 0.2s">
-            <VStack align="flex-start" gap={0} flex={1}>
+            <VStack align="flex-start" gap={0} flex={1} w="100%">
               <HStack align="flex-start" justify="space-between" w="100%">
                 <VStack align="flex-start" gap={0}>
                   <Text fontSize="lg" fontWeight="semibold">
@@ -37,6 +37,7 @@ export default function AdminChallengeCard({ title, description, isActive }: Adm
                 fontSize="sm"
                 w="100%"
                 textAlign={"start"}
+                color="gray.600"
                 css={{ WebkitLineClamp: 2, display: "-webkit-box", WebkitBoxOrient: "vertical" }}
               >
                 {description}
@@ -60,7 +61,11 @@ export default function AdminChallengeCard({ title, description, isActive }: Adm
           </Menu.Root>
         </HStack>
         {/* Full Description */}
-        <Collapsible.Content></Collapsible.Content>
+        <Collapsible.Content>
+          <Text color="gray.600" fontSize="sm" pt={3}>
+            {description}
+          </Text>
+        </Collapsible.Content>
       </VStack>
     </Collapsible.Root>
   );
