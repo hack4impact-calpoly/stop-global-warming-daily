@@ -5,6 +5,7 @@ export type ITaskAssignment = {
   user_id: Types.ObjectId;
   task_id: Types.ObjectId;
   date: Date;
+  isComplete: boolean;
 };
 
 const taskAssignmentSchema = new Schema(

@@ -158,7 +158,7 @@ export default function Page() {
             onPrevious={() => setSelectedDate((prev) => addMonths(prev, -1))}
             onNext={() => setSelectedDate((prev) => addMonths(prev, 1))}
           ></CalendarSubHeader>
-          <MonthView />
+          <MonthView selectedDate={selectedDate} userId={userData ? String(userData._id) : undefined} />
         </>
       );
   };
