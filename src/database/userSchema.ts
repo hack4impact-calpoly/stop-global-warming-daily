@@ -5,6 +5,16 @@ export enum Role {
   admin = "admin",
 }
 
+export enum Tag {
+  SustainableFood = "Sustainable Food",
+  Transportation = "Transportation",
+  Shopping = "Shopping",
+  Community = "Community/Volunteering",
+  WasteReduction = "Waste Reduction",
+  EnergySaving = "Energy Saving",
+  Nature = "Nature Preservation & Restoration",
+}
+
 export interface IUsers {
   _id: Types.ObjectId;
   email: string;
@@ -12,6 +22,10 @@ export interface IUsers {
   role: Role;
   streak: number;
   completedDates: Date[];
+  birthday?: Date;
+  locationName?: string;
+  locationCoordinates: number[];
+  interests: string[];
 }
 
 const UserSchema = new Schema(
@@ -32,6 +46,33 @@ const UserSchema = new Schema(
 
     completedDates: {
       type: [Date],
+      default: [],
+    },
+
+    birthday: {
+      type: Date,
+    },
+
+    locationName: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    locationCoordinates: {
+      type: [Number],
+      default: [],
+      validate: {
+        validator: function (value: number[]) {
+          return value.length === 0 || value.length === 2;
+        },
+        message: "locationCoordinates must contain exactly 2 numbers",
+      },
+    },
+
+    interests: {
+      type: [String],
+      enum: Object.values(Tag),
       default: [],
     },
   },
