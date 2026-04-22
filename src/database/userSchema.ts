@@ -5,6 +5,16 @@ export enum Role {
   admin = "admin",
 }
 
+export enum Tag {
+  SustainableFood = "Sustainable Food",
+  Transportation = "Transportation",
+  Shopping = "Shopping",
+  Community = "Community/Volunteering",
+  WasteReduction = "Waste Reduction",
+  EnergySaving = "Energy Saving",
+  Nature = "Nature Preservation & Restoration",
+}
+
 export interface IUsers {
   _id: Types.ObjectId;
   email: string;
@@ -62,6 +72,7 @@ const UserSchema = new Schema(
 
     interests: {
       type: [String],
+      enum: Object.values(Tag),
       default: [],
     },
   },
