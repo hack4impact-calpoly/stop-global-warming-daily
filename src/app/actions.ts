@@ -1,6 +1,14 @@
 "use server";
 
-import webpush from "web-push";
+type PushSubscriptionPayload = {
+  endpoint: string;
+  keys: {
+    p256dh: string;
+    auth: string;
+  };
+};
+
+import webpush, { type PushSubscription as WebPushSubscription } from "web-push";
 
 webpush.setVapidDetails(
   "<mailto:your-email@example.com>",
@@ -8,9 +16,9 @@ webpush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY!,
 );
 
-let subscription: PushSubscription | null = null;
+let subscription: WebPushSubscription | null = null;
 
-export async function subscribeUser(sub: PushSubscription) {
+export async function subscribeUser(sub: PushSubscriptionPayload) {
   subscription = sub;
   // In a production environment, you would want to store the subscription in a database
   // For example: await db.subscriptions.create({ data: sub })
@@ -31,7 +39,7 @@ export async function sendNotification(message: string) {
 
   try {
     await webpush.sendNotification(
-      subscription,
+      subscription as any, // safe now because we validated shape
       JSON.stringify({
         title: "Test Notification",
         body: message,

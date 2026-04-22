@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { subscribeUser, unsubscribeUser, sendNotification } from "./actions";
+import { subscribeUser, unsubscribeUser, sendNotification } from "app/actions";
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -42,8 +42,22 @@ export default function PushNotificationManager() {
       applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!),
     });
     setSubscription(sub);
-    const serializedSub = JSON.parse(JSON.stringify(sub));
-    await subscribeUser(serializedSub);
+
+    const json = sub.toJSON();
+
+    if (!json.endpoint || !json.keys?.p256dh || !json.keys?.auth) {
+      throw new Error("Invalid push subscription");
+    }
+
+    const payload = {
+      endpoint: json.endpoint,
+      keys: {
+        p256dh: json.keys.p256dh,
+        auth: json.keys.auth,
+      },
+    };
+
+    await subscribeUser(payload);
   }
 
   async function unsubscribeFromPush() {
