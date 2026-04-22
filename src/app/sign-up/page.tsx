@@ -373,7 +373,6 @@ export default function Page() {
               </Button>
               <Field.ErrorText>{confirmPasswordError}</Field.ErrorText>
             </Field.Root>
-            <Box id="clerk-captcha" />
           </VStack>
         </VStack>
       );
