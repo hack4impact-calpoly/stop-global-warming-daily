@@ -1,4 +1,4 @@
-import { Box, Collapsible, HStack, Menu, Portal, Text, VStack } from "@chakra-ui/react";
+import { Collapsible, HStack, IconButton, Menu, Portal, Text, VStack } from "@chakra-ui/react";
 import { LuEllipsisVertical } from "react-icons/lu";
 
 interface AdminChallengeCardProps {
@@ -42,22 +42,17 @@ export default function AdminChallengeCard({ title, description, isActive }: Adm
           </Collapsible.Trigger>
           <Menu.Root>
             <Menu.Trigger asChild>
-              <Box
-                as="button"
-                type="button"
+              <IconButton
                 aria-label={`Open actions for ${title}`}
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
+                variant="ghost"
+                size="sm"
                 alignSelf="flex-start"
                 flexShrink={0}
                 mt={1}
-                p={1}
                 ml="auto"
-                cursor="pointer"
               >
                 <LuEllipsisVertical size="24px" />
-              </Box>
+              </IconButton>
             </Menu.Trigger>
             <Portal>
               <Menu.Positioner>
