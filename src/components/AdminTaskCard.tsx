@@ -24,20 +24,16 @@ export default function AdminTaskCard({ title, description, minEstimate, availab
         boxShadow={"0px 1px 8px rgba(89, 91, 98, 0.1)"}
       >
         {/* Header */}
-        <HStack h="100%" w="100%" align="flex-start" gap={0} alignItems={"flex-start"}>
-          <Collapsible.Trigger transition="transform 0.2s">
-            <VStack align="flex-start" gap={0} flex={1} w="100%">
-              <HStack align="flex-start" justify="space-between" w="100%">
-                <VStack align="flex-start" gap={0}>
-                  <Text fontSize="lg" fontWeight="semibold">
-                    {title}
-                  </Text>
-                  <Divider>
-                    <Text fontSize="sm">{estimateLabel}</Text>
-                    <Text fontSize="sm">{availability}</Text>
-                  </Divider>
-                </VStack>
-              </HStack>
+        <HStack h="100%" w="100%" align="flex-start" gap={2}>
+          <Collapsible.Trigger transition="transform 0.2s" flex="1" w="100%">
+            <VStack align="flex-start" gap={0} w="100%">
+              <Text fontSize="lg" fontWeight="semibold">
+                {title}
+              </Text>
+              <Divider>
+                <Text fontSize="sm">{estimateLabel}</Text>
+                <Text fontSize="sm">{availability}</Text>
+              </Divider>
               <Text
                 fontSize="sm"
                 w="100%"
@@ -51,7 +47,20 @@ export default function AdminTaskCard({ title, description, minEstimate, availab
           </Collapsible.Trigger>
           <Menu.Root>
             <Menu.Trigger asChild>
-              <Box mt={"30px"}>
+              <Box
+                as="button"
+                type="button"
+                aria-label={`Open actions for ${title}`}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                alignSelf="flex-start"
+                flexShrink={0}
+                mt={1}
+                p={1}
+                ml="auto"
+                cursor="pointer"
+              >
                 <LuEllipsisVertical size="24px" />
               </Box>
             </Menu.Trigger>
