@@ -6,6 +6,7 @@ import { useSignUp } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import OnboardingProgressBar from "@/components/OnboardingProgressBar";
+import { PasswordInput } from "@/components/ui/password-input";
 
 const pinStyles = {
   w: "37px",
@@ -80,13 +81,6 @@ export default function Page() {
     setConfirmPassword(e.target.value);
   };
 
-  const toggleShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-  const toggleShowConfirmPassword = () => {
-    setShowConfirmPassword(!showConfirmPassword);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -115,9 +109,6 @@ export default function Page() {
     try {
       await signUp.create({
         emailAddress,
-        password,
-        firstName,
-        lastName,
       });
 
       // sent verification code
@@ -321,7 +312,7 @@ export default function Page() {
               <Field.Label fontSize={16} fontWeight={"semibold"}>
                 Create Password
               </Field.Label>
-              <Input
+              <PasswordInput
                 value={password}
                 placeholder="At least 8 characters long"
                 variant="subtle"
@@ -333,23 +324,13 @@ export default function Page() {
                 bg={"none"}
                 h={"35px"}
               />
-              <Button
-                onClick={toggleShowPassword}
-                position="absolute"
-                bg="transparent"
-                color="black"
-                right="0"
-                transform="translateY(65%)"
-              >
-                <LuEye size={20} />
-              </Button>
               <Field.ErrorText>{passwordError}</Field.ErrorText>
             </Field.Root>
             <Field.Root required invalid={confirmPasswordError != ""}>
               <Field.Label fontSize={16} fontWeight={"semibold"}>
                 Confirm Password
               </Field.Label>
-              <Input
+              <PasswordInput
                 value={confirmPassword}
                 placeholder="Re-enter your password"
                 variant="subtle"
@@ -361,16 +342,6 @@ export default function Page() {
                 bg={"none"}
                 h={"35px"}
               />
-              <Button
-                onClick={toggleShowConfirmPassword}
-                position="absolute"
-                bg="transparent"
-                color="black"
-                right="0"
-                transform="translateY(65%)"
-              >
-                <LuEye size={20} />
-              </Button>
               <Field.ErrorText>{confirmPasswordError}</Field.ErrorText>
             </Field.Root>
           </VStack>
