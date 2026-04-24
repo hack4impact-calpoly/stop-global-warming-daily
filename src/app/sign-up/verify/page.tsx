@@ -1,5 +1,5 @@
 "use client";
-import { VStack, Text, Field, Button, HStack, PinInput } from "@chakra-ui/react";
+import { VStack, Text, Field, HStack, PinInput } from "@chakra-ui/react";
 import { useNewUserFormContext } from "@/lib/hooks/sign-up";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
