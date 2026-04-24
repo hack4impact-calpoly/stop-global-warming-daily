@@ -7,10 +7,11 @@ import { useRouter } from "next/navigation";
 import { useSignUp } from "@clerk/nextjs";
 import { accountSchema } from "@/lib/formSchemas/accountSchema";
 import z from "zod";
+import OnboardingFooter from "@/components/OnboardingFooter";
 
 export default function Page() {
   const { isLoaded, signUp } = useSignUp();
-  //Context for all pages
+  //context for all pages
   const { user: savedUser, updateUserData, step: currentStep, updateStep } = useNewUserFormContext();
   const router = useRouter();
 
@@ -23,7 +24,7 @@ export default function Page() {
     confirmPassword: "",
   });
 
-  const onNext = async () => {
+  const handleNext = async () => {
     if (!isLoaded) return;
     // reset all errors
     setErrors({ firstname: "", lastname: "", email: "", password: "", confirmPassword: "" });
@@ -61,7 +62,7 @@ export default function Page() {
       //   strategy: "email_code",
       // });
       updateStep(currentStep + 1);
-      router.push("/sign-up/step2");
+      router.push("/sign-up/verify");
     } catch (err: any) {
       console.error("Clerk sign up error:", err);
 
@@ -198,22 +199,7 @@ export default function Page() {
         </VStack>
       </VStack>
 
-      <Box>
-        <HStack position="absolute" bottom={10} left={0} right={0} h="80px" px={10} alignItems="center">
-          <Button
-            ml="auto"
-            px={10}
-            py={6}
-            borderRadius={8}
-            bg="#64B9FF"
-            color="white"
-            _hover={{ bg: "#17374b" }}
-            onClick={onNext}
-          >
-            Next
-          </Button>
-        </HStack>
-      </Box>
+      <OnboardingFooter onNext={handleNext} />
     </>
   );
 }

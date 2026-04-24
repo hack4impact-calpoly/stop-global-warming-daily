@@ -4,7 +4,14 @@ import OnboardingProgressBar from "@/components/OnboardingProgressBar";
 import { UserFormContextProvider } from "@/lib/context/sign-up";
 import { usePathname, redirect } from "next/navigation";
 import { useNewUserFormContext } from "@/lib/hooks/sign-up";
-const steps = ["/sign-up/", "/sign-up/step1", "/sign-up/step2", "/sign-up/step3", "/sign-up/step4", "/sign-up/step5"];
+const steps = [
+  "/sign-up/",
+  "/sign-up/account",
+  "/sign-up/verify",
+  "/sign-up/personalize",
+  "/sign-up/interests",
+  "/sign-up/select-profile",
+];
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const { step: currentStep } = useNewUserFormContext();

@@ -4,16 +4,18 @@ import { useNewUserFormContext } from "@/lib/hooks/sign-up";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSignUp } from "@clerk/nextjs";
+import OnboardingFooter from "@/components/OnboardingFooter";
 
 export default function Page() {
   // hooks
   const { isLoaded, signUp } = useSignUp(); //clerk
   const { user, step: currentStep, updateStep } = useNewUserFormContext(); //current step
   const router = useRouter();
-  const [code, setCode] = useState<string[]>(["", "", "", ""]);
+  const [code, setCode] = useState<string[]>(["", "", "", "", "", ""]);
   const [codeError, setCodeError] = useState<string>("");
+  const [isSendingAgain, setIsSendingAgain] = useState(false);
 
-  const onNext = async () => {
+  const handleNext = async () => {
     if (!isLoaded) return;
 
     // try the given code!
@@ -25,7 +27,7 @@ export default function Page() {
       // if (verifyAttempt.status === "missing_requirements" || verifyAttempt.status === "complete") {
       if (true) {
         updateStep(currentStep + 1);
-        router.push("/sign-up/step3/");
+        router.push("/sign-up/personalize");
       } else {
         setCodeError("Incorrect Code!");
         // console.error("Sign up attempt not complete: ", verifyAttempt);
@@ -36,10 +38,36 @@ export default function Page() {
     }
   };
 
-  const onBack = () => {
+  const handleBack = () => {
     updateStep(currentStep - 1);
     router.back();
   };
+
+  const handleSendAgain = async () => {
+    if (!isLoaded || !signUp) return;
+
+    try {
+      setIsSendingAgain(true);
+      setCodeError("");
+
+      await signUp.prepareEmailAddressVerification({
+        strategy: "email_code",
+      });
+
+      console.log("sent new code");
+
+      setCode(["", "", "", "", "", ""]);
+    } catch (err: any) {
+      console.error(JSON.stringify(err, null, 2));
+
+      setCodeError(
+        err?.errors?.[0]?.longMessage || err?.errors?.[0]?.message || "Could not send a new code. Please try again.",
+      );
+    } finally {
+      setIsSendingAgain(false);
+    }
+  };
+
   return (
     <>
       <VStack w="100%" h="100%" align="center" justify="center" gap="10">
@@ -54,9 +82,14 @@ export default function Page() {
             </Text>
           </VStack>
           <HStack fontWeight="medium" fontSize="16px" justify="center">
-            <Text color="#3B3B3B">Didn’t get a code?</Text>
-            <Text onClick={() => null} color="#057CC6" cursor="pointer">
-              Send Again
+            <Text color="#3B3B3B">Didn&apos;t get a code?</Text>
+            <Text
+              onClick={isSendingAgain ? undefined : handleSendAgain}
+              color="#057CC6"
+              cursor={isSendingAgain ? "not-allowed" : "pointer"}
+              opacity={isSendingAgain ? 0.6 : 1}
+            >
+              {isSendingAgain ? "Sending..." : "Send Again"}
             </Text>
           </HStack>
         </VStack>
@@ -95,34 +128,7 @@ export default function Page() {
           <Field.ErrorText textAlign="center">{codeError}</Field.ErrorText>
         </Field.Root>
       </VStack>
-      <HStack position="absolute" bottom={10} left={0} right={0} h="80px" px={10} alignItems="center">
-        <Button
-          variant="outline"
-          px={10}
-          py={6}
-          borderRadius={8}
-          bg="#F9FAFB"
-          color="#64B9FF"
-          borderColor={"#64B9FF"}
-          _hover={{ bg: "#17374b" }}
-          onClick={onBack}
-        >
-          Back
-        </Button>
-
-        <Button
-          ml="auto"
-          px={10}
-          py={6}
-          borderRadius={8}
-          bg="#64B9FF"
-          color="white"
-          _hover={{ bg: "#17374b" }}
-          onClick={onNext}
-        >
-          Next
-        </Button>
-      </HStack>
+      <OnboardingFooter onBack={handleBack} onNext={handleNext} />
     </>
   );
 }

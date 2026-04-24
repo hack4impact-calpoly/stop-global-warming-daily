@@ -10,7 +10,7 @@ export default function Page() {
 
   const onNext = async () => {
     updateStep(currentStep + 1);
-    router.push("/sign-up/step1");
+    router.push("/sign-up/account");
   };
 
   return (
