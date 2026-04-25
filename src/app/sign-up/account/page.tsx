@@ -15,6 +15,7 @@ export default function Page() {
   const { user: savedUser, updateUserData, step: currentStep, updateStep } = useNewUserFormContext();
   const router = useRouter();
 
+  const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({
     firstname: "",
@@ -34,7 +35,7 @@ export default function Page() {
       firstname: savedUser?.firstname ?? "",
       lastname: savedUser?.lastname ?? "",
       email: savedUser?.email ?? "",
-      password: savedUser?.password ?? "",
+      password: password,
       confirmPassword,
     });
 
@@ -53,14 +54,15 @@ export default function Page() {
 
     // try to connect to clerk!!
     try {
-      // await signUp.create({
-      //   emailAddress: result.data.email,
-      // });
+      await signUp.create({
+        emailAddress: result.data.email,
+        password: result.data.password,
+      });
 
-      // // send verification code
-      // await signUp.prepareEmailAddressVerification({
-      //   strategy: "email_code",
-      // });
+      // send verification code
+      await signUp.prepareEmailAddressVerification({
+        strategy: "email_code",
+      });
       updateStep(currentStep + 1);
       router.push("/sign-up/verify");
     } catch (err: any) {
@@ -77,10 +79,10 @@ export default function Page() {
   };
 
   return (
-    <>
-      <VStack display="flex" alignContent="center" w="100%" h="100%" gap={7}>
+    <VStack w="100%" flex="1" align="stretch" gap={0} pb={10}>
+      <VStack w="100%" flex="1" align="center" justify="flex-start" gap={7} px={10}>
         <VStack gap={0}>
-          <Text fontSize="34px" fontWeight="semibold" color="#057CC6">
+          <Text fontSize="33px" fontWeight="semibold" color="#057CC6">
             Create An Account
           </Text>
 
@@ -92,7 +94,7 @@ export default function Page() {
           </HStack>
         </VStack>
 
-        <VStack w="100%" px={10} gap={4} align="stretch">
+        <VStack w="100%" gap={4} align="stretch">
           <Field.Root required invalid={errors.firstname !== ""}>
             <Field.Label fontSize={16} fontWeight="semibold">
               First Name
@@ -158,11 +160,17 @@ export default function Page() {
               Create Password
             </Field.Label>
             <PasswordInput
-              value={savedUser?.password || ""}
+              value={password}
               placeholder="At least 8 characters long"
               variant="subtle"
               fontSize="16px"
-              onChange={(e) => updateUserData({ password: e.target.value })}
+              onChange={(e) => {
+                setErrors((prev) => ({
+                  ...prev,
+                  password: "",
+                }));
+                setPassword(e.target.value);
+              }}
               borderRadius={12}
               borderColor="#A9AEB1"
               _placeholder={{ color: "#A9AEB1", fontSize: "12px" }}
@@ -200,6 +208,6 @@ export default function Page() {
       </VStack>
 
       <OnboardingFooter onNext={handleNext} />
-    </>
+    </VStack>
   );
 }

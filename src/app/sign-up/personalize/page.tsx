@@ -16,8 +16,9 @@ export default function Page() {
     location: "",
   });
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
-  const birthdayDate = savedUser?.birthday ? new Date(savedUser?.birthday) : null;
+  const router = useRouter();
 
+  const birthdayDate = savedUser?.birthday ? new Date(savedUser?.birthday) : null;
   const [month, setMonth] = useState(birthdayDate ? String(birthdayDate.getMonth() + 1) : "");
   const [day, setDay] = useState(birthdayDate ? String(birthdayDate.getDate()) : "");
   const [year, setYear] = useState(birthdayDate ? String(birthdayDate.getFullYear()) : "");
@@ -55,8 +56,6 @@ export default function Page() {
 
     return Array.from({ length: daysInMonth }, (_, index) => String(index + 1));
   }, [month, year]);
-
-  const router = useRouter();
 
   const handleFetchLocation = async () => {
     if (isFetchingLocation) return;
@@ -157,8 +156,8 @@ export default function Page() {
   };
 
   return (
-    <>
-      <VStack w="100%" h="100%" align="center" justify="center" gap="10" px={10}>
+    <VStack w="100%" flex="1" align="stretch" gap={0} pb={10}>
+      <VStack w="100%" flex="1" align="center" justify="flex-start" gap={10} px={10}>
         <VStack>
           <VStack gap={0}>
             <Text fontSize="24px" lineHeight="29px" fontWeight="600" color="#057CC6" textAlign="start">
@@ -175,7 +174,9 @@ export default function Page() {
         <VStack w="100%" gap={4} align="stretch">
           <Field.Root required invalid={errors.birthday !== ""}>
             <VStack align="start" gap={2} w="100%">
-              <Field.Label fontWeight="semibold">Birthday</Field.Label>
+              <Field.Label fontSize={"16px"} fontWeight="semibold">
+                Birthday
+              </Field.Label>
 
               <HStack w="100%" gap={2}>
                 <NativeSelect.Root flex="1">
@@ -250,7 +251,9 @@ export default function Page() {
 
           <Field.Root required invalid={errors.location !== ""}>
             <VStack align="start" gap={2} w="100%">
-              <Field.Label fontWeight="semibold">Location</Field.Label>
+              <Field.Label fontSize={"16px"} fontWeight="semibold">
+                Location
+              </Field.Label>
 
               <Box position="relative" w="100%">
                 <Input
@@ -309,7 +312,7 @@ export default function Page() {
       </VStack>
 
       <OnboardingFooter onBack={handleBack} onNext={handleNext} />
-    </>
+    </VStack>
   );
 }
 const pickerStyles = {

@@ -11,29 +11,40 @@ const steps = [
   "/sign-up/personalize",
   "/sign-up/interests",
   "/sign-up/select-profile",
+  "/sign-up/done",
 ];
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const { step: currentStep } = useNewUserFormContext();
   const pathname = usePathname();
   const routeStep = Math.max(steps.indexOf(pathname), 0);
-  const isProgressHidden = routeStep === 0;
+  const isProgressHidden = routeStep === 0 || routeStep === 6;
 
   if (routeStep > 0 && currentStep === 0) {
     redirect("/sign-up");
   }
 
   return (
-    <VStack display={"flex"} w={"100%"} h={"100%"} gap={0}>
+    <VStack w="100%" minH="100dvh" gap={0} align="stretch">
       {/* Top Progress Bar */}
-      <Box w="100%" px={7} pt={4} pb={2} mb={10} h="8px">
+      <Box w="100%" px={7} pt={4} pb={4} mb={10} flexShrink={0}>
         <Box hidden={isProgressHidden}>
           <OnboardingProgressBar currentStep={routeStep} />
         </Box>
       </Box>
 
-      {/* Content */}
-      {children}
+      {/* Content Area */}
+      <Box
+        as="main"
+        w="100%"
+        flex="1"
+        display="flex"
+        flexDirection="column"
+        justifyContent="flex-start"
+        alignItems="stretch"
+      >
+        {children}
+      </Box>
     </VStack>
   );
 }

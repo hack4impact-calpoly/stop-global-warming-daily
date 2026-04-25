@@ -3,7 +3,6 @@ export type UserFormData = {
   firstname?: string;
   lastname?: string;
   email?: string;
-  password?: string;
 
   birthday?: Date;
   locationName?: string;

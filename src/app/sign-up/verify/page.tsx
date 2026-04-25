@@ -21,17 +21,16 @@ export default function Page() {
     // try the given code!
     try {
       console.log(code.join(""));
-      // const verifyAttempt = await signUp.attemptEmailAddressVerification({ code: code.join("") });
+      const verifyAttempt = await signUp.attemptEmailAddressVerification({ code: code.join("") });
 
       // if verification correct then go to next screen
-      // if (verifyAttempt.status === "missing_requirements" || verifyAttempt.status === "complete") {
-      if (true) {
+      if (verifyAttempt.status === "missing_requirements" || verifyAttempt.status === "complete") {
         updateStep(currentStep + 1);
         router.push("/sign-up/personalize");
       } else {
         setCodeError("Incorrect Code!");
-        // console.error("Sign up attempt not complete: ", verifyAttempt);
-        // console.error("Sign up attempt status:", verifyAttempt.status);
+        console.error("Sign up attempt not complete: ", verifyAttempt);
+        console.error("Sign up attempt status:", verifyAttempt.status);
       }
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
@@ -69,8 +68,8 @@ export default function Page() {
   };
 
   return (
-    <>
-      <VStack w="100%" h="100%" align="center" justify="center" gap="10">
+    <VStack w="100%" flex="1" align="stretch" gap={0} pb={10}>
+      <VStack w="100%" flex="1" align="center" justify="flex-start" gap={8} px={10}>
         <VStack>
           <VStack gap={0}>
             <Text fontSize="34px" fontWeight="semibold" color="#057CC6" textAlign="center">
@@ -129,7 +128,7 @@ export default function Page() {
         </Field.Root>
       </VStack>
       <OnboardingFooter onBack={handleBack} onNext={handleNext} />
-    </>
+    </VStack>
   );
 }
 

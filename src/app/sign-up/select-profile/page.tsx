@@ -1,16 +1,69 @@
 "use client";
-import { VStack, Button, HStack } from "@chakra-ui/react";
+import { VStack, SimpleGrid, Text, Box, Image } from "@chakra-ui/react";
 import { useNewUserFormContext } from "@/lib/hooks/sign-up";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import OnboardingFooter from "@/components/OnboardingFooter";
+import { LuCheck } from "react-icons/lu";
+import { useSignUp } from "@clerk/nextjs";
+
+const AVATARS: string[] = [
+  "/avatars/avatar-1.png",
+  "/avatars/avatar-2.png",
+  "/avatars/avatar-3.png",
+  "/avatars/avatar-4.png",
+  "/avatars/avatar-5.png",
+  "/avatars/avatar-6.png",
+];
 
 export default function Page() {
-  const { step: currentStep, updateStep } = useNewUserFormContext(); //current step
+  const { step: currentStep, updateStep, user: savedUser, updateUserData } = useNewUserFormContext();
+  const { isLoaded, signUp, setActive } = useSignUp();
   const router = useRouter();
 
+  const [selected, setSelected] = useState<string>(savedUser?.picture ?? "");
+
   const handleNext = async () => {
+    // check to make sure we're loaded
+    if (!isLoaded) {
+      return;
+    }
+
     try {
+      //finish sign up and now complete
+      await signUp.update({
+        firstName: savedUser?.firstname,
+        lastName: savedUser?.lastname,
+      });
+
+      // if complete, set session to active and redirect user
+      if (signUp.status === "complete") {
+        const data = {
+          email: savedUser?.email,
+          name: savedUser?.firstname + " " + savedUser?.lastname,
+          birthday: savedUser?.birthday,
+          locationName: savedUser?.locationName,
+          locationCoordinates: savedUser?.locationCoordinates,
+          interests: savedUser?.interests,
+        };
+
+        let res = await fetch("/api/user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+
+        await setActive({
+          session: signUp.createdSessionId,
+        });
+
+        updateUserData({ picture: selected });
+        updateStep(currentStep + 1);
+        router.push("/sign-up/done");
+      } else {
+        console.error("Sign up attempt not complete: ", signUp);
+        console.error("Sign up attempt status:", signUp.status);
+      }
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
     }
@@ -22,9 +75,61 @@ export default function Page() {
   };
 
   return (
-    <>
-      <VStack></VStack>
+    <VStack w="100%" flex="1" align="stretch" gap={0} pb={10}>
+      <VStack w="100%" flex="1" align="center" justify="flex-start" gap={8} px={10}>
+        <Text fontSize="24px" lineHeight="29px" fontWeight="semibold" color="#057CC6" textAlign="center" w="100%">
+          Choose your profile picture!
+        </Text>
+
+        <SimpleGrid columns={3} gap={4} w="100%">
+          {AVATARS.map((src) => {
+            const isSelected = selected === src;
+            return (
+              <Box
+                key={src}
+                position="relative"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                cursor="pointer"
+                onClick={() => setSelected(src)}
+              >
+                <Box
+                  w="73px"
+                  h="73px"
+                  borderRadius="full"
+                  overflow="hidden"
+                  border={isSelected ? "2px solid #64B9FF" : "2.5px solid transparent"}
+                  transition="border 0.15s ease"
+                  bg="#E8F1F8"
+                >
+                  {/* IMAGE GOES HERE */}
+                  {/* <Image src={src} alt={`Avatar option`} w="100%" h="100%" objectFit="cover" /> */}
+                </Box>
+
+                {isSelected && (
+                  <Box
+                    position="absolute"
+                    top={"0px"}
+                    right="15px"
+                    w="20px"
+                    h="20px"
+                    borderRadius="full"
+                    bg="#64B9FF"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <LuCheck color="#000000" />
+                  </Box>
+                )}
+              </Box>
+            );
+          })}
+        </SimpleGrid>
+      </VStack>
+
       <OnboardingFooter onBack={handleBack} onNext={handleNext} />
-    </>
+    </VStack>
   );
 }
