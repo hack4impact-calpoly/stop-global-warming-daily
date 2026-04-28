@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import OnboardingFooter from "@/components/OnboardingFooter";
 import { LuCheck } from "react-icons/lu";
 
-export const tags = [
+const tags = [
   { label: "Sustainable Food", color: "#F2A62E" },
   { label: "Transportation", color: "#C667F2" },
   { label: "Shopping", color: "#2E86F2" },
@@ -14,9 +14,8 @@ export const tags = [
   { label: "Waste Reduction", color: "#F2682E" },
   { label: "Energy Saving", color: "#43C9C1" },
   { label: "Nature Preservation & Restoration", color: "#3FB84D" },
-] as const;
-
-export const focuses = [
+];
+const focuses = [
   "Building daily eco-friendly habits",
   "Reducing my everyday waste",
   "Reducing my energy consumption",
