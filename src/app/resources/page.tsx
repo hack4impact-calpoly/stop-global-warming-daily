@@ -114,10 +114,10 @@ export default function Page() {
         <Text fontSize="4xl" letterSpacing="-0.05em" whiteSpace="nowrap" fontWeight={"semibold"} pb={4}>
           Resources
         </Text>
-        <Box maxW="560px" mx="auto">
+        <Box w="full">
           <HStack
             mb={5}
-            flex={1}
+            w="full"
             h="56px"
             bg="white"
             borderRadius="full"
