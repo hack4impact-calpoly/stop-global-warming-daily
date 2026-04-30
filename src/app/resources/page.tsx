@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Box, HStack, Input, Text, VStack } from "@chakra-ui/react";
-import { LuBell, LuSearch } from "react-icons/lu";
+import { Box, HStack, Text, VStack } from "@chakra-ui/react";
+import { LuBell } from "react-icons/lu";
 import ResourceListCard from "@/components/ResourceListCard";
+import SearchBar from "@/components/SearchBar";
 
 type ResourcesTab = "discover" | "saved";
 
@@ -112,26 +113,7 @@ export default function Page() {
     <Box minH="100vh" bg="#F9FAFB" px={6} pt={10} pb={28}>
       <Box maxW="560px" mx="auto">
         <HStack gap={4} mb={8}>
-          <HStack
-            flex={1}
-            h="74px"
-            bg="white"
-            borderRadius="full"
-            px={6}
-            boxShadow="0px 1px 8px rgba(89, 91, 98, 0.08)"
-            border="1px solid #EEF0F2"
-          >
-            <Input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search"
-              border="none"
-              outline="none"
-              fontSize="lg"
-              _focusVisible={{ boxShadow: "none" }}
-            />
-            <LuSearch size={32} color="black" />
-          </HStack>
+          <SearchBar value={query} onChange={setQuery} />
 
           <Box
             h="74px"
