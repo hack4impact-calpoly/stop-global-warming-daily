@@ -146,6 +146,7 @@ export default function Home() {
                   challenge={challenge}
                   tasks={challenge.tasks}
                   completionPercentage={challenge.completionPercentage}
+                  userId={userData ? String(userData._id) : undefined}
                 />
               ))}
             </VStack>

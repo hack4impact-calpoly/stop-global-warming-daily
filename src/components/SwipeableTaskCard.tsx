@@ -119,7 +119,7 @@ export default function SwipeableTaskCard({
     const el = cardRef.current;
     if (!el) return;
     const onTouchMove = (e: TouchEvent) => {
-      if (isHorizontalSwipeRef.current === true) e.preventDefault();
+      if (isHorizontalSwipeRef.current === true || e.cancelable) e.preventDefault();
     };
     el.addEventListener("touchmove", onTouchMove, { passive: false });
     return () => el.removeEventListener("touchmove", onTouchMove);
