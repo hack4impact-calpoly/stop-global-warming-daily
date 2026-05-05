@@ -1,6 +1,6 @@
 "use client";
+
 import { Box, IconButton, Text, VStack, HStack } from "@chakra-ui/react";
-import ProgressRing from "@/components/ProgressRing";
 import ChallengeComponent, { ChallengeSummary, ChallengeTask } from "@/components/ChallengeComponent";
 import { LuChevronLeft, LuChevronRight, LuBell } from "react-icons/lu";
 import Link from "next/link";
@@ -11,9 +11,15 @@ import { IUsers } from "@/database/userSchema";
 import { useRouter } from "next/navigation";
 import StreakCard from "@/components/StreakCard";
 
+type HydratedChallenge = ChallengeSummary & {
+  tasks: ChallengeTask[];
+  completionPercentage: number;
+};
+
 export default function Home() {
   const { isSignedIn, user, isLoaded } = useUser();
   const [userData, setUserData] = useState<IUsers | null>(null);
+  const [challenges, setChallenges] = useState<HydratedChallenge[]>([]);
 
   const router = useRouter();
 
@@ -39,6 +45,7 @@ export default function Home() {
           setUserData(null);
           return;
         }
+
         const userObj: IUsers = await res.json();
         setUserData(userObj);
 
@@ -68,12 +75,40 @@ export default function Home() {
         console.log("user is signed in!");
       }
     };
-    if (!isLoaded) {
-      return;
-    }
-    // get user
+
+    if (!isLoaded) return;
     getUser();
   }, [isLoaded, isSignedIn, user]);
+
+  useEffect(() => {
+    const getChallenges = async () => {
+      if (!userData?._id) {
+        setChallenges([]);
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/challenges/user/${userData._id}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!res.ok) {
+          setChallenges([]);
+          return;
+        }
+
+        const challengeData: HydratedChallenge[] = await res.json();
+        console.log("challengeData", challengeData);
+        setChallenges(challengeData);
+      } catch (error) {
+        console.error(error);
+        setChallenges([]);
+      }
+    };
+
+    getChallenges();
+  }, [userData?._id]);
 
   return (
     <main>
@@ -87,22 +122,36 @@ export default function Home() {
               <LuBell size={24} />
             </Link>
           </HStack>
-          {/* Progress Ring */}
+
           <VStack w={"full"} gap={5} py={"20px"}>
             <HStack w={"full"} justifyContent={"space-between"}>
-              <IconButton area-label="Previous Progress Ring" variant={"ghost"}>
+              <IconButton aria-label="Previous Progress Ring" variant={"ghost"}>
                 <LuChevronLeft />
               </IconButton>
               <Text fontSize={"x-large"} fontWeight={"semibold"}>
                 Today
               </Text>
-              <IconButton area-label="Next Progress Ring" variant={"ghost"}>
+              <IconButton aria-label="Next Progress Ring" variant={"ghost"}>
                 <LuChevronRight />
               </IconButton>
             </HStack>
-            <StreakCard></StreakCard>
+            <StreakCard />
           </VStack>
-          {/* Tasks */}
+
+          {challenges.length > 0 && (
+            <VStack w="full" align="stretch" gap={3}>
+              {challenges.map((challenge) => (
+                <ChallengeComponent
+                  key={challenge._id}
+                  challenge={challenge}
+                  tasks={challenge.tasks}
+                  completionPercentage={challenge.completionPercentage}
+                  userId={userData ? String(userData._id) : undefined}
+                />
+              ))}
+            </VStack>
+          )}
+
           <TaskList userId={userData ? String(userData._id) : undefined} />
         </VStack>
       </Box>
