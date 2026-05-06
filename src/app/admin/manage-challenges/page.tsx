@@ -174,24 +174,25 @@ export default function ManageChallengePage() {
             {renderChallengeContent()}
           </VStack>
         </VStack>
+        <Link href="/admin/manage-challenges/new-challenge">
+          <IconButton
+            aria-label="Add challenge"
+            position="fixed"
+            right="320px"
+            bottom="130px"
+            w="64px"
+            h="64px"
+            borderRadius="full"
+            variant="outline"
+            borderColor="blue.300"
+            color="blue.300"
+            bg="white"
+            zIndex={20}
+          >
+            <LuPlus size={28} />
+          </IconButton>
+        </Link>
       </Box>
-
-      <IconButton
-        aria-label="Add challenge"
-        position="fixed"
-        bottom={{ base: "110px", md: "24px" }}
-        right="24px"
-        w="64px"
-        h="64px"
-        borderRadius="full"
-        variant="outline"
-        borderColor="blue.300"
-        color="blue.300"
-        bg="white"
-        zIndex={20}
-      >
-        <LuPlus size={28} />
-      </IconButton>
     </Box>
   );
 }

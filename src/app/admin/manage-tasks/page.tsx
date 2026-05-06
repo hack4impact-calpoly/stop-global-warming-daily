@@ -177,24 +177,25 @@ export default function ManageTasksPage() {
             {renderTaskContent()}
           </VStack>
         </VStack>
+        <Link href="/admin/manage-tasks/new-tasks">
+          <IconButton
+            aria-label="Add challenge"
+            position="fixed"
+            right="320px"
+            bottom="130px"
+            w="64px"
+            h="64px"
+            borderRadius="full"
+            variant="outline"
+            borderColor="blue.300"
+            color="blue.300"
+            bg="white"
+            zIndex={20}
+          >
+            <LuPlus size={28} />
+          </IconButton>
+        </Link>
       </Box>
-
-      <IconButton
-        aria-label="Add task"
-        position="fixed"
-        bottom={{ base: "110px", md: "24px" }}
-        right="24px"
-        w="64px"
-        h="64px"
-        borderRadius="full"
-        variant="outline"
-        borderColor="blue.300"
-        color="blue.300"
-        bg="white"
-        zIndex={20}
-      >
-        <LuPlus size={28} />
-      </IconButton>
     </Box>
   );
 }
