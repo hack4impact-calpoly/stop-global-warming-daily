@@ -25,6 +25,7 @@ export async function GET(_req: Request, { params }: { params: { userId: string 
       return NextResponse.json([], { status: 200 });
     }
 
+    const challengeIds = challenges.map((challenge: any) => String(challenge._id));
     const allTaskIds = challenges.flatMap((challenge: any) => (challenge.task_ids || []).map((id: any) => String(id)));
 
     const uniqueTaskIds = [...new Set(allTaskIds)].filter((id) => Types.ObjectId.isValid(id));
@@ -37,19 +38,16 @@ export async function GET(_req: Request, { params }: { params: { userId: string 
 
     const assignments = await TaskAssignment.find({
       user_id: userObjectId,
+      challenge_id: { $in: challengeIds },
       task_id: { $in: uniqueTaskIds },
-    })
-      .sort({ date: -1 })
-      .lean();
+    }).lean();
 
-    const latestAssignmentByTaskId = new Map<string, any>();
-
-    assignments.forEach((assignment: any) => {
-      const key = String(assignment.task_id);
-      if (!latestAssignmentByTaskId.has(key)) {
-        latestAssignmentByTaskId.set(key, assignment);
-      }
-    });
+    const assignmentByChallengeTaskKey = new Map<string, any>(
+      assignments.map((assignment: any) => [
+        `${String(assignment.challenge_id)}:${String(assignment.task_id)}`,
+        assignment,
+      ]),
+    );
 
     const response = challenges.map((challenge: any) => {
       const tasksForChallenge = (challenge.task_ids || [])
@@ -57,9 +55,10 @@ export async function GET(_req: Request, { params }: { params: { userId: string 
           const task = taskById.get(String(taskId));
           if (!task) return null;
 
-          const assignment = latestAssignmentByTaskId.get(String(taskId));
+          const assignment = assignmentByChallengeTaskKey.get(`${String(challenge._id)}:${String(taskId)}`);
 
           return {
+            assignmentId: assignment?._id ? String(assignment._id) : "",
             _id: String(task._id),
             title: task.title,
             description: task.description,

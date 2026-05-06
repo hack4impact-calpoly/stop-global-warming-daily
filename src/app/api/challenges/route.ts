@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import ChallengeModel from "@/database/challengeSchema";
 import connectDB from "@/database/db";
+import { syncChallengeTaskAssignments, toUniqueObjectIdStrings } from "@/lib/challengeTaskAssignments";
 
 export async function GET() {
   try {
@@ -24,6 +25,12 @@ export async function POST(req: Request) {
     const challenge = await req.json();
 
     const newChallenge = await ChallengeModel.create(challenge);
+
+    await syncChallengeTaskAssignments({
+      challengeId: newChallenge._id.toString(),
+      userIds: toUniqueObjectIdStrings(newChallenge.users ?? []),
+      taskIds: toUniqueObjectIdStrings(newChallenge.task_ids ?? []),
+    });
 
     return NextResponse.json(newChallenge, { status: 201 });
   } catch (error) {

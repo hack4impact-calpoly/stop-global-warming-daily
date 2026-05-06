@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Types } from "mongoose";
 import connectDB from "@/database/db";
 import TaskAssignment from "@/database/taskAssignmentSchema";
 import User from "@/database/userSchema";
@@ -30,7 +31,26 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
   try {
     await connectDB();
 
+    if (!Types.ObjectId.isValid(params.userId)) {
+      return NextResponse.json({ error: "Invalid user id" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
+    const challengeId = searchParams.get("challengeId");
+
+    if (challengeId) {
+      if (!Types.ObjectId.isValid(challengeId)) {
+        return NextResponse.json({ error: "Invalid challenge id" }, { status: 400 });
+      }
+
+      const challengeAssignments = await TaskAssignment.find({
+        user_id: params.userId,
+        challenge_id: challengeId,
+      }).sort({ _id: 1 });
+
+      return NextResponse.json(challengeAssignments, { status: 200 });
+    }
+
     const dateParam = searchParams.get("date");
     const range = searchParams.get("range") ?? "day";
     const baseDate = dateParam ? new Date(dateParam) : new Date();
@@ -41,6 +61,7 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 
     const taskAssignment = await TaskAssignment.find({
       user_id: params.userId,
+      challenge_id: { $exists: false },
       date: { $gte: startDate, $lt: endDate },
     }).sort({ date: 1 });
 
@@ -74,6 +95,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { userId: st
 
           return {
             user_id: params.userId,
+            challenge_id: { $exists: false },
             date: { $gte: today, $lt: tomorrow },
           };
         })();
@@ -120,6 +142,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { userId: s
 
     const deleted = await TaskAssignment.findOneAndDelete({
       user_id: params.userId,
+      challenge_id: { $exists: false },
       date: { $gte: today, $lt: tomorrow },
     });
 

@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
 
     const taskAssignments = await TaskAssignment.find({
       user_id: userId,
+      challenge_id: { $exists: false },
       date: { $gte: startDate, $lt: endDate },
     })
       .select("_id task_id date isComplete")
