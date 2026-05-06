@@ -110,6 +110,9 @@ export default function Home() {
     getChallenges();
   }, [userData?._id]);
 
+  if (!isLoaded || !isSignedIn) {
+    return null;
+  }
   return (
     <main>
       <Box display={"flex"} justifyContent={"center"}>
