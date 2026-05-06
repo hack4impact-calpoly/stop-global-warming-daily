@@ -22,8 +22,8 @@ export default function NewChallengePage() {
   const [description, setDescription] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showAllTags, setShowAllTags] = useState(false);
-  const [hours, setHours] = useState(0);
-  const [minutes, setMinutes] = useState(0);
+  const [hours, setHours] = useState("0");
+  const [minutes, setMinutes] = useState("0");
   const [availableIn, setAvailableIn] = useState<string[]>([]);
 
   const visibleTags = showAllTags ? AVAILABLE_TAGS : AVAILABLE_TAGS.slice(0, 5);
@@ -134,7 +134,7 @@ export default function NewChallengePage() {
                   <Input
                     type="number"
                     value={hours}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setHours(Number(e.target.value))}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setHours(e.target.value)}
                     bg="gray.100"
                     border="none"
                     borderRadius="full"
@@ -146,7 +146,7 @@ export default function NewChallengePage() {
                   <Input
                     type="number"
                     value={minutes}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setMinutes(Number(e.target.value))}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setMinutes(e.target.value)}
                     bg="gray.100"
                     border="none"
                     borderRadius="full"

@@ -136,7 +136,7 @@ export default function ManageChallengePage() {
 
   return (
     <Box display="flex" justifyContent="center" minH="100vh">
-      <Box maxW="400px" w="full" minH="100vh" p={5} pb={{ base: "140px", md: "40px" }}>
+      <Box maxW="400px" w="full" minH="100vh" p={5} pb="160px" position="relative">
         <VStack align="stretch" gap={4}>
           <HStack gap={3}>
             <Link href="/admin" style={{ display: "flex", alignItems: "center" }}>
@@ -178,8 +178,8 @@ export default function ManageChallengePage() {
           <IconButton
             aria-label="Add challenge"
             position="fixed"
-            right="320px"
-            bottom="130px"
+            right={{ base: "24px", md: "calc(50% - 176px)" }}
+            bottom={{ base: "96px", md: "40px" }}
             w="64px"
             h="64px"
             borderRadius="full"
@@ -187,6 +187,7 @@ export default function ManageChallengePage() {
             borderColor="blue.300"
             color="blue.300"
             bg="white"
+            shadow="md"
             zIndex={20}
           >
             <LuPlus size={28} />
