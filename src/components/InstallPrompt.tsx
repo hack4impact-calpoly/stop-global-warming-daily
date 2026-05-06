@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { subscribeUser, unsubscribeUser, sendNotification } from "./actions";
+// import { subscribeUser, unsubscribeUser, sendNotification } from "./actions";
 
 export default function InstallPrompt() {
   const [isIOS, setIsIOS] = useState(false);

@@ -61,12 +61,18 @@ export default function PushNotificationManager() {
   }
 
   async function unsubscribeFromPush() {
-    await subscription?.unsubscribe();
+    if (!subscription) return;
+
+    const endpoint = subscription.endpoint;
+
+    await subscription.unsubscribe();
     setSubscription(null);
-    await unsubscribeUser();
+
+    await unsubscribeUser(endpoint);
   }
 
   async function sendTestNotification() {
+    console.log(subscription);
     if (subscription) {
       await sendNotification(message);
       setMessage("");
