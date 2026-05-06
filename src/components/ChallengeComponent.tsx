@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Collapsible, Progress, Text } from "@chakra-ui/react";
-import TaskCard from "@/components/TaskCard";
 import Style from "@/styles/ChallengeComponent.module.css";
 import SwipeableTaskCard from "./SwipeableTaskCard";
 
 export type ChallengeTask = {
+  assignmentId?: string;
   _id: string;
   title: string;
   description: string;
@@ -35,55 +35,59 @@ export default function ChallengeComponent({
   defaultOpen = false,
   userId,
 }: ChallengeComponentProps) {
-  const safeCompletion = Math.min(100, Math.max(0, completionPercentage));
   const [localTasks, setLocalTasks] = useState(tasks);
+  const localCompletionPercentage =
+    localTasks.length === 0
+      ? completionPercentage
+      : Math.round((localTasks.filter((task) => task.completed).length / localTasks.length) * 100);
+  const safeCompletion = Math.min(100, Math.max(0, localCompletionPercentage));
 
   useEffect(() => {
     setLocalTasks(tasks);
   }, [tasks]);
 
-  const updateCompletion = async (taskId: string, completed: boolean) => {
+  const updateCompletion = async (taskId: string, assignmentId: string | undefined, completed: boolean) => {
     if (!userId) return;
 
-    let previousCompleted: boolean | undefined;
+    const previousTasks = localTasks;
 
     setLocalTasks((prev) =>
       prev.map((t) => {
         if (t._id === taskId) {
-          previousCompleted = t.completed;
           if (t.completed === completed) return t;
           return { ...t, completed };
         }
         return t;
       }),
     );
-    // const previousCompleted = task.completed;
-    // setTask((prev) => (prev ? { ...prev, completed } : prev));
 
     try {
-      // TODO: make API route that gets taskAssignments based on userId and challengeId
-      /*
+      if (!assignmentId) {
+        throw new Error("Missing challenge assignment id");
+      }
+
       const res = await fetch(`/api/taskAssignment/${userId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isComplete: completed }),
+        body: JSON.stringify({
+          assignmentId,
+          isComplete: completed,
+        }),
       });
-      
 
       if (!res.ok) throw new Error("Failed to update task completion");
-      */
     } catch (error) {
       console.error("Failed to update completion:", error);
-      // setTask((prev) => (prev ? { ...prev, completed: previousCompleted } : prev));
+      setLocalTasks(previousTasks);
     }
   };
 
   const markComplete = (task: ChallengeTask) => {
-    updateCompletion(task._id, true);
+    updateCompletion(task._id, task.assignmentId, true);
   };
 
   const markIncomplete = (task: ChallengeTask) => {
-    updateCompletion(task._id, false);
+    updateCompletion(task._id, task.assignmentId, false);
   };
 
   return (
