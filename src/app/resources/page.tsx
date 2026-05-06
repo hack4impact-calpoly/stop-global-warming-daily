@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { Box, HStack, Text, VStack } from "@chakra-ui/react";
-import { LuBell } from "react-icons/lu";
 import ResourceListCard from "@/components/ResourceListCard";
 import SearchBar from "@/components/SearchBar";
 
@@ -110,84 +109,75 @@ export default function Page() {
   const resourcesToShow = activeTab === "discover" ? visibleResources : savedResources;
 
   return (
-    <Box minH="100vh" bg="#F9FAFB" px={6} pt={10} pb={28}>
-      <Box maxW="560px" mx="auto">
-        <HStack gap={4} mb={8}>
-          <SearchBar value={query} onChange={setQuery} />
+    <Box display={"flex"} justifyContent={"center"}>
+      <VStack maxW="400px" align="stretch" w="full" gap={2} p={5}>
+        <Text fontSize="4xl" letterSpacing="-0.05em" whiteSpace="nowrap" fontWeight={"semibold"} pb={4}>
+          Resources
+        </Text>
+        <Box w="full">
+          <HStack gap={4} mb={8}>
+            <SearchBar value={query} onChange={setQuery} />
+          </HStack>
 
-          <Box
-            h="74px"
-            w="74px"
-            bg="white"
-            borderRadius="full"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            boxShadow="0px 1px 8px rgba(89, 91, 98, 0.08)"
-            border="1px solid #EEF0F2"
-          >
-            <LuBell size={30} color="black" />
-          </Box>
-        </HStack>
-
-        <HStack mb={6}>
-          <ResourcesTabButton
-            label="Discover"
-            active={activeTab === "discover"}
-            onClick={() => setActiveTab("discover")}
-          />
-          <ResourcesTabButton label="Saved" active={activeTab === "saved"} onClick={() => setActiveTab("saved")} />
-        </HStack>
-
-        {activeTab === "discover" && (
-          <Box
-            bg="#EAF4FB"
-            borderRadius="26px"
-            minH="234px"
-            px={8}
-            pb={8}
-            mb={8}
-            display="flex"
-            flexDirection="column"
-            justifyContent="flex-end"
-          >
-            <Text fontSize="3xl" fontWeight="bold" color="black" lineHeight="1.1">
-              Featured Resource
-            </Text>
-            <Text fontSize="md" color="black">
-              Resource Description
-            </Text>
-          </Box>
-        )}
-
-        <VStack align="stretch" gap={5}>
-          {resourcesToShow.map((resource) => (
-            <ResourceListCard
-              key={resource.id}
-              title={resource.title}
-              description={resource.description}
-              interestTags={resource.interestTags}
-              variant={activeTab}
-              onSave={() => handleSave(resource.id)}
-              onDelete={() => handleDelete(resource.id)}
+          <HStack mb={6}>
+            <ResourcesTabButton
+              label="Discover"
+              active={activeTab === "discover"}
+              onClick={() => setActiveTab("discover")}
             />
-          ))}
+            <ResourcesTabButton label="Saved" active={activeTab === "saved"} onClick={() => setActiveTab("saved")} />
+          </HStack>
 
-          {resourcesToShow.length === 0 && (
+          {activeTab === "discover" && (
             <Box
-              bg="white"
-              borderRadius="20px"
-              p={6}
-              textAlign="center"
-              boxShadow="0px 4px 18px rgba(89, 91, 98, 0.10)"
+              bg="#EAF4FB"
+              borderRadius="26px"
+              minH="234px"
+              px={8}
+              pb={8}
+              mb={8}
+              display="flex"
+              flexDirection="column"
+              justifyContent="flex-end"
             >
-              <Text fontWeight="semibold" color="black">
-                No resources found.
+              <Text fontSize="3xl" fontWeight="bold" color="black" lineHeight="1.1">
+                Featured Resource
+              </Text>
+              <Text fontSize="md" color="black">
+                Resource Description
               </Text>
             </Box>
           )}
-        </VStack>
-      </Box>
+
+          <VStack align="stretch" gap={5}>
+            {resourcesToShow.map((resource) => (
+              <ResourceListCard
+                key={resource.id}
+                title={resource.title}
+                description={resource.description}
+                interestTags={resource.interestTags}
+                variant={activeTab}
+                onSave={() => handleSave(resource.id)}
+                onDelete={() => handleDelete(resource.id)}
+              />
+            ))}
+
+            {resourcesToShow.length === 0 && (
+              <Box
+                bg="white"
+                borderRadius="20px"
+                p={6}
+                textAlign="center"
+                boxShadow="0px 4px 18px rgba(89, 91, 98, 0.10)"
+              >
+                <Text fontWeight="semibold" color="black">
+                  No resources found.
+                </Text>
+              </Box>
+            )}
+          </VStack>
+        </Box>
+      </VStack>
     </Box>
   );
 }
