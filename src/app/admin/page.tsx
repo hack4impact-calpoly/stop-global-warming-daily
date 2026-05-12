@@ -35,6 +35,15 @@ export default function AdminPage() {
               <LuChevronRight />
             </HStack>
           </Link>
+
+          <Link href="/admin/manage-resources" style={{ textDecoration: "none", color: "inherit" }}>
+            <HStack w="full" justifyContent="space-between" cursor="pointer" p={2}>
+              <Text fontWeight="normal" fontSize="md">
+                Add a Resource
+              </Text>
+              <LuChevronRight />
+            </HStack>
+          </Link>
         </VStack>
       </VStack>
     </Box>

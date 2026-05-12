@@ -31,6 +31,10 @@ export async function PATCH(req: Request, { params }: { params: { resourceId: st
       return NextResponse.json({ error: "No updates provided" }, { status: 400 });
     }
 
+    if (updates.tags && !Array.isArray(updates.tags)) {
+      return NextResponse.json({ error: "tags must be an array" }, { status: 400 });
+    }
+
     const updatedResource = await ResourceModel.findByIdAndUpdate(
       params.resourceId,
       { $set: updates },
