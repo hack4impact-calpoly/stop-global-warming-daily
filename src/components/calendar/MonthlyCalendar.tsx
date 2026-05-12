@@ -65,7 +65,7 @@ const getDayStyles = (category: DayCategory) => {
   switch (category) {
     case "current":
       return {
-        bg: "#4A4B54",
+        bg: "#64b9ff",
       };
     case "completed":
       return {
