@@ -1,199 +1,313 @@
 "use client";
 
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Box, Text, VStack, HStack, Input, Textarea, Button } from "@chakra-ui/react";
 import { LuChevronLeft, LuCheck } from "react-icons/lu";
 
-const AVAILABLE_TAGS = [
+type AvailableTag = {
+  label: string;
+  color: string;
+};
+
+type TimeValidationResult =
+  | {
+      isValid: true;
+      totalMinutes: number;
+    }
+  | {
+      isValid: false;
+      error: string;
+    };
+
+const AVAILABLE_TAGS: AvailableTag[] = [
   { label: "Shopping", color: "blue.400" },
   { label: "Sustainable Food", color: "yellow.500" },
   { label: "Waste Reduction", color: "orange.400" },
   { label: "Energy Saving", color: "teal.400" },
   { label: "Transportation", color: "purple.400" },
-  { label: "Water Conservation", color: "cyan.400" },
-  { label: "Community", color: "green.400" },
+  { label: "Community/Volunteering", color: "green.400" },
+  { label: "Nature Preservation & Restoration", color: "green.500" },
 ];
 
-const AVAILABLE_IN = ["Daily Tasks", "Spring Challenge", "SLO Challenge"];
-
 export default function NewTaskPage() {
+  const router = useRouter();
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showAllTags, setShowAllTags] = useState(false);
   const [hours, setHours] = useState("0");
   const [minutes, setMinutes] = useState("0");
-  const [availableIn, setAvailableIn] = useState<string[]>([]);
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const visibleTags = showAllTags ? AVAILABLE_TAGS : AVAILABLE_TAGS.slice(0, 5);
   const hiddenCount = AVAILABLE_TAGS.length - 5;
 
   const toggleTag = (label: string) => {
-    setSelectedTags((prev) => (prev.includes(label) ? prev.filter((t) => t !== label) : [...prev, label]));
+    setSelectedTags((prev) => (prev.includes(label) ? prev.filter((tag) => tag !== label) : [...prev, label]));
   };
 
-  const toggleAvailableIn = (label: string) => {
-    setAvailableIn((prev) => (prev.includes(label) ? prev.filter((t) => t !== label) : [...prev, label]));
+  const handleWholeNumberChange = (value: string, setter: (value: string) => void, max?: number) => {
+    if (!/^\d*$/.test(value)) return;
+
+    if (value !== "" && max !== undefined && Number(value) > max) {
+      return;
+    }
+
+    setter(value);
+    setError("");
+  };
+
+  const getValidatedTotalMinutes = (): TimeValidationResult => {
+    const parsedHours = hours === "" ? 0 : Number(hours);
+    const parsedMinutes = minutes === "" ? 0 : Number(minutes);
+
+    if (!Number.isInteger(parsedHours) || parsedHours < 0) {
+      return {
+        isValid: false,
+        error: "Hours must be a whole number greater than or equal to 0.",
+      };
+    }
+
+    if (!Number.isInteger(parsedMinutes) || parsedMinutes < 0 || parsedMinutes > 59) {
+      return {
+        isValid: false,
+        error: "Minutes must be a whole number between 0 and 59.",
+      };
+    }
+
+    const totalMinutes = parsedHours * 60 + parsedMinutes;
+
+    if (totalMinutes <= 0) {
+      return {
+        isValid: false,
+        error: "Time to complete must be greater than 0 minutes.",
+      };
+    }
+
+    return {
+      isValid: true,
+      totalMinutes,
+    };
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const trimmedTitle = title.trim();
+    const trimmedDescription = description.trim();
+
+    if (!trimmedTitle) {
+      setError("Task name is required.");
+      return;
+    }
+
+    if (!trimmedDescription) {
+      setError("Task description is required.");
+      return;
+    }
+
+    const timeResult = getValidatedTotalMinutes();
+
+    if (!timeResult.isValid) {
+      setError(timeResult.error);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/task", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: trimmedTitle,
+          description: trimmedDescription,
+          time: timeResult.totalMinutes,
+          tags: selectedTags,
+        }),
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(data?.error ?? "Failed to create task.");
+      }
+
+      router.push("/admin/manage-tasks");
+      router.refresh();
+    } catch (submitError) {
+      console.error("Failed to create task:", submitError);
+      setError(submitError instanceof Error ? submitError.message : "Failed to create task.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <Box display="flex" justifyContent="center" minH="100vh" bg="gray.50">
       <Box maxW="400px" w="full" minH="100vh" p={5} pb="120px">
-        <VStack align="stretch" gap={6}>
-          {/* Header */}
-          <HStack gap={3}>
-            <Link href="/admin/manage-tasks" style={{ display: "flex", alignItems: "center" }}>
-              <LuChevronLeft size={28} />
-            </Link>
-            <Text fontWeight="semibold" fontSize="4xl">
-              New Task
-            </Text>
-          </HStack>
+        <form onSubmit={handleSubmit}>
+          <VStack align="stretch" gap={6}>
+            <HStack gap={3}>
+              <Link href="/admin/manage-tasks" style={{ display: "flex", alignItems: "center" }}>
+                <LuChevronLeft size={28} />
+              </Link>
+              <Text fontWeight="semibold" fontSize="4xl">
+                New Task
+              </Text>
+            </HStack>
 
-          {/* Form Card */}
-          <Box bg="white" borderRadius="xl" p={4} shadow="sm">
-            <VStack align="stretch" gap={5}>
-              {/* Task Name */}
-              <VStack align="stretch" gap={1}>
-                <Text fontWeight="semibold" fontSize="sm">
-                  Task Name
-                </Text>
-                <Input
-                  placeholder="Name your task..."
-                  value={title}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
-                  bg="gray.100"
-                  border="none"
-                  borderRadius="lg"
-                />
-              </VStack>
+            <Box bg="white" borderRadius="xl" p={4} shadow="sm">
+              <VStack align="stretch" gap={5}>
+                <VStack align="stretch" gap={1}>
+                  <Text fontWeight="semibold" fontSize="sm">
+                    Task Name
+                  </Text>
+                  <Input
+                    placeholder="Name your task..."
+                    value={title}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                      setTitle(event.target.value);
+                      setError("");
+                    }}
+                    bg="gray.100"
+                    border="none"
+                    borderRadius="lg"
+                  />
+                </VStack>
 
-              {/* Task Description */}
-              <VStack align="stretch" gap={1}>
-                <Text fontWeight="semibold" fontSize="sm">
-                  Task Description
-                </Text>
-                <Textarea
-                  placeholder="Describe your task..."
-                  value={description}
-                  onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
-                  bg="gray.100"
-                  border="none"
-                  borderRadius="lg"
-                  resize="none"
-                  rows={4}
-                />
-              </VStack>
+                <VStack align="stretch" gap={1}>
+                  <Text fontWeight="semibold" fontSize="sm">
+                    Task Description
+                  </Text>
+                  <Textarea
+                    placeholder="Describe your task..."
+                    value={description}
+                    onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
+                      setDescription(event.target.value);
+                      setError("");
+                    }}
+                    bg="gray.100"
+                    border="none"
+                    borderRadius="lg"
+                    resize="none"
+                    rows={4}
+                  />
+                </VStack>
 
-              {/* Tags */}
-              <VStack align="stretch" gap={2}>
-                <Text fontWeight="semibold" fontSize="sm">
-                  Add Tags
-                </Text>
-                <HStack flexWrap="wrap" gap={2}>
-                  {visibleTags.map((tag) => {
-                    const selected = selectedTags.includes(tag.label);
-                    return (
+                <VStack align="stretch" gap={2}>
+                  <Text fontWeight="semibold" fontSize="sm">
+                    Add Tags
+                  </Text>
+                  <HStack flexWrap="wrap" gap={2}>
+                    {visibleTags.map((tag: AvailableTag) => {
+                      const selected = selectedTags.includes(tag.label);
+
+                      return (
+                        <Button
+                          key={tag.label}
+                          type="button"
+                          size="sm"
+                          borderRadius="full"
+                          variant="outline"
+                          borderColor={tag.color}
+                          color={tag.color}
+                          bg="white"
+                          onClick={() => toggleTag(tag.label)}
+                          _hover={{ bg: "gray.50" }}
+                        >
+                          {tag.label} {selected && <LuCheck size={14} />}
+                        </Button>
+                      );
+                    })}
+
+                    {!showAllTags && hiddenCount > 0 && (
                       <Button
-                        key={tag.label}
+                        type="button"
                         size="sm"
                         borderRadius="full"
                         variant="outline"
-                        borderColor={tag.color}
-                        color={tag.color}
-                        bg="white"
-                        onClick={() => toggleTag(tag.label)}
-                        _hover={{ bg: "gray.50" }}
-                      >
-                        {tag.label} {selected && <LuCheck size={14} />}
-                      </Button>
-                    );
-                  })}
-                  {!showAllTags && hiddenCount > 0 && (
-                    <Button
-                      size="sm"
-                      borderRadius="full"
-                      variant="outline"
-                      borderColor="gray.400"
-                      color="gray.600"
-                      onClick={() => setShowAllTags(true)}
-                    >
-                      + {hiddenCount} More
-                    </Button>
-                  )}
-                </HStack>
-              </VStack>
-
-              {/* Time to Complete */}
-              <VStack align="stretch" gap={2}>
-                <Text fontWeight="semibold" fontSize="sm">
-                  Time to Complete
-                </Text>
-                <HStack gap={2}>
-                  <Input
-                    type="number"
-                    value={hours}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setHours(e.target.value)}
-                    bg="gray.100"
-                    border="none"
-                    borderRadius="full"
-                    w="60px"
-                    textAlign="center"
-                    min={0}
-                  />
-                  <Text fontSize="sm">Hours and</Text>
-                  <Input
-                    type="number"
-                    value={minutes}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setMinutes(e.target.value)}
-                    bg="gray.100"
-                    border="none"
-                    borderRadius="full"
-                    w="60px"
-                    textAlign="center"
-                    min={0}
-                    max={59}
-                  />
-                  <Text fontSize="sm">minutes</Text>
-                </HStack>
-              </VStack>
-
-              {/* Available In */}
-              <VStack align="stretch" gap={2}>
-                <Text fontWeight="semibold" fontSize="sm">
-                  Available in
-                </Text>
-                <HStack flexWrap="wrap" gap={3}>
-                  {AVAILABLE_IN.map((option) => (
-                    <HStack key={option} gap={2} cursor="pointer" onClick={() => toggleAvailableIn(option)}>
-                      <Box
-                        w="18px"
-                        h="18px"
-                        borderRadius="sm"
-                        border="2px"
                         borderColor="gray.400"
-                        bg={availableIn.includes(option) ? "gray.400" : "white"}
-                      />
-                      <Text fontSize="sm">{option}</Text>
-                    </HStack>
-                  ))}
-                </HStack>
+                        color="gray.600"
+                        onClick={() => setShowAllTags(true)}
+                      >
+                        + {hiddenCount} More
+                      </Button>
+                    )}
+                  </HStack>
+                </VStack>
+
+                <VStack align="stretch" gap={2}>
+                  <Text fontWeight="semibold" fontSize="sm">
+                    Time to Complete
+                  </Text>
+                  <HStack gap={2}>
+                    <Input
+                      type="number"
+                      inputMode="numeric"
+                      step={1}
+                      value={hours}
+                      onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                        handleWholeNumberChange(event.target.value, setHours)
+                      }
+                      bg="gray.100"
+                      border="none"
+                      borderRadius="full"
+                      w="60px"
+                      textAlign="center"
+                      min={0}
+                    />
+                    <Text fontSize="sm">Hours and</Text>
+                    <Input
+                      type="number"
+                      inputMode="numeric"
+                      step={1}
+                      value={minutes}
+                      onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                        handleWholeNumberChange(event.target.value, setMinutes, 59)
+                      }
+                      bg="gray.100"
+                      border="none"
+                      borderRadius="full"
+                      w="60px"
+                      textAlign="center"
+                      min={0}
+                      max={59}
+                    />
+                    <Text fontSize="sm">minutes</Text>
+                  </HStack>
+                </VStack>
+
+                {error && (
+                  <Text color="red.500" fontSize="sm">
+                    {error}
+                  </Text>
+                )}
               </VStack>
-            </VStack>
-          </Box>
-          <Button
-            maxW="400px"
-            w="full"
-            variant="outline"
-            borderColor="blue.300"
-            color="blue.300"
-            borderRadius="lg"
-            h="52px"
-          >
-            Save Task
-          </Button>
-        </VStack>
+            </Box>
+
+            <Button
+              type="submit"
+              maxW="400px"
+              w="full"
+              variant="outline"
+              borderColor="blue.300"
+              color="blue.300"
+              borderRadius="lg"
+              h="52px"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Saving..." : "Save Task"}
+            </Button>
+          </VStack>
+        </form>
       </Box>
     </Box>
   );

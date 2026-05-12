@@ -20,9 +20,17 @@ export type ITasks = {
 
 const taskSchema = new Schema(
   {
-    title: { type: String, required: true },
-    description: { type: String, required: true },
-    time: { type: Number, required: true },
+    title: { type: String, required: true, trim: true },
+    description: { type: String, required: true, trim: true },
+    time: {
+      type: Number,
+      required: true,
+      min: 1,
+      validate: {
+        validator: Number.isInteger,
+        message: "Time must be a whole number of minutes",
+      },
+    },
     tags: { type: [String], enum: Object.values(Tag), default: [] },
   },
   {
