@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Box, Text, VStack, HStack, Input, Textarea, Button } from "@chakra-ui/react";
 import { LuChevronLeft, LuCheck } from "react-icons/lu";
+import { IoMdReturnLeft } from "react-icons/io";
 
 const AVAILABLE_TAGS = [
   { label: "Shopping", color: "blue.400" },
@@ -26,6 +27,7 @@ export default function NewResourcePage() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showAllTags, setShowAllTags] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState("");
 
   const visibleTags = showAllTags ? AVAILABLE_TAGS : AVAILABLE_TAGS.slice(0, 5);
   const hiddenCount = AVAILABLE_TAGS.length - 5;
@@ -36,10 +38,30 @@ export default function NewResourcePage() {
 
   const handleSave = async () => {
     if (!title.trim() || !description.trim() || !location.trim() || !link.trim()) {
+      if (!title.trim()) {
+        setError("Resource name is required.");
+        return;
+      }
+
+      if (!description.trim()) {
+        setError("Task description is required.");
+        return;
+      }
+
+      if (!location.trim()) {
+        setError("Location is required.");
+        return;
+      }
+
+      if (!link.trim()) {
+        setError("Link is required.");
+        return;
+      }
       return;
     }
 
     setIsSaving(true);
+    setError("");
 
     try {
       const response = await fetch("/api/resource", {
@@ -183,6 +205,11 @@ export default function NewResourcePage() {
                   )}
                 </HStack>
               </VStack>
+              {error && (
+                <Text color="red.500" fontSize="sm">
+                  {error}
+                </Text>
+              )}
             </VStack>
           </Box>
 
