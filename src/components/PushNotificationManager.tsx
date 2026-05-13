@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { subscribeUser, unsubscribeUser, sendNotification } from "app/actions";
+import { IUsers } from "@/database/userSchema";
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -14,7 +15,12 @@ function urlBase64ToUint8Array(base64String: string) {
   return outputArray;
 }
 
-export default function PushNotificationManager() {
+type PushNotificationManagerProps = {
+  userData: IUsers;
+  setUserData: React.Dispatch<React.SetStateAction<IUsers | null>>;
+};
+
+export default function PushNotificationManager({ userData, setUserData }: PushNotificationManagerProps) {
   const [isSupported, setIsSupported] = useState(false);
   const [subscription, setSubscription] = useState<PushSubscription | null>(null);
   const [message, setMessage] = useState("");
@@ -58,6 +64,56 @@ export default function PushNotificationManager() {
     };
 
     await subscribeUser(payload);
+
+    // PATCH/PUT call
+
+    try {
+      const res = await fetch(`/api/user/${userData._id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ notificationsAsked: true, notificationsEnabled: true }),
+      });
+
+      if (!res.ok) throw new Error("Failed to subscribe to notifications :(");
+    } catch (error) {
+      console.error("Caught error in subscribing: ", error);
+    }
+
+    setUserData((prev) =>
+      prev
+        ? {
+            ...prev,
+            notificationsAsked: true,
+            notificationsEnabled: true,
+          }
+        : prev,
+    );
+  }
+
+  async function noNotifications() {
+    // PATCH the user to set askNotifications to true
+
+    try {
+      const res = await fetch(`/api/user/${userData._id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ notificationsAsked: true, notificationsEnabled: false }),
+      });
+
+      if (!res.ok) throw new Error("Failed to subscribe to notifications :(");
+    } catch (error) {
+      console.error("Caught error in subscribing: ", error);
+    }
+
+    setUserData((prev) =>
+      prev
+        ? {
+            ...prev,
+            notificationsAsked: true,
+            notificationsEnabled: false,
+          }
+        : prev,
+    );
   }
 
   async function unsubscribeFromPush() {
@@ -86,7 +142,15 @@ export default function PushNotificationManager() {
   return (
     <div>
       <h3>Push Notifications</h3>
-      {subscription ? (
+      <p>Would you like to subscribe to push notifications?</p>
+      <button onClick={subscribeToPush}>Subscribe</button>
+      <button onClick={noNotifications}>No Thanks</button>
+    </div>
+  );
+}
+
+/*
+ {subscription ? (
         <>
           <p>You are subscribed to push notifications.</p>
           <button onClick={unsubscribeFromPush}>Unsubscribe</button>
@@ -104,6 +168,4 @@ export default function PushNotificationManager() {
           <button onClick={subscribeToPush}>Subscribe</button>
         </>
       )}
-    </div>
-  );
-}
+*/

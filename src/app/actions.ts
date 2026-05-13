@@ -2,6 +2,8 @@
 import Subscription from "@/database/subscriptionSchema";
 import connectDB from "@/database/db";
 
+import webpush, { type PushSubscription as WebPushSubscription } from "web-push";
+
 type PushSubscriptionPayload = {
   endpoint: string;
   keys: {
@@ -9,8 +11,6 @@ type PushSubscriptionPayload = {
     auth: string;
   };
 };
-
-import webpush, { type PushSubscription as WebPushSubscription } from "web-push";
 
 webpush.setVapidDetails(
   "mailto:stopglobalwarming@gmail.com",

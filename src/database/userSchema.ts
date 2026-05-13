@@ -12,6 +12,10 @@ export interface IUsers {
   role: Role;
   streak: number;
   completedDates: Date[];
+  notificationsAsked: boolean;
+  notificationsEnabled: boolean;
+  installationAsked: boolean;
+  installed: boolean;
 }
 
 const UserSchema = new Schema(
@@ -33,6 +37,30 @@ const UserSchema = new Schema(
     completedDates: {
       type: [Date],
       default: [],
+    },
+
+    notificationsAsked: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+
+    notificationsEnabled: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+
+    installationAsked: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+
+    installed: {
+      type: Boolean,
+      required: true,
+      default: false,
     },
   },
   { timestamps: true },

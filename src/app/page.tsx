@@ -90,8 +90,10 @@ export default function Home() {
             </Link>
           </HStack>
           <div>
-            <PushNotificationManager />
-            <InstallPrompt />
+            {userData && !userData.notificationsAsked && (
+              <PushNotificationManager userData={userData} setUserData={setUserData} />
+            )}
+            {userData && !userData.installationAsked && <InstallPrompt userData={userData} setUserData={setUserData} />}
           </div>
           {/* Progress Ring */}
           <VStack w={"full"} gap={5} py={"20px"}>

@@ -1,9 +1,15 @@
 "use client";
 
+import { IUsers } from "@/database/userSchema";
 import { useState, useEffect } from "react";
 // import { subscribeUser, unsubscribeUser, sendNotification } from "./actions";
 
-export default function InstallPrompt() {
+type InstallPromptProps = {
+  userData: IUsers;
+  setUserData: React.Dispatch<React.SetStateAction<IUsers | null>>;
+};
+
+export default function InstallPrompt({ userData, setUserData }: InstallPromptProps) {
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
 
@@ -15,6 +21,32 @@ export default function InstallPrompt() {
 
   if (isStandalone) {
     return null; // Don't show install button if already installed
+  }
+
+  async function noInstallation() {
+    // PATCH the user to set askNotifications to true
+
+    try {
+      const res = await fetch(`/api/user/${userData._id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ installationAsked: true, installed: false }),
+      });
+
+      if (!res.ok) throw new Error("Failed to subscribe to notifications :(");
+    } catch (error) {
+      console.error("Caught error in subscribing: ", error);
+    }
+
+    setUserData((prev) =>
+      prev
+        ? {
+            ...prev,
+            installationAsked: true,
+            installed: false,
+          }
+        : prev,
+    );
   }
 
   return (
@@ -36,6 +68,7 @@ export default function InstallPrompt() {
           .
         </p>
       )}
+      <button onClick={noInstallation}>No Thanks</button>
     </div>
   );
 }
