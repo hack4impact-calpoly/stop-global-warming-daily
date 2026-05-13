@@ -36,6 +36,9 @@ export default function Page() {
           height: "auto",
         }}
       />
+      <a href="http://www.freepik.com" style={{ fontSize: 10 }}>
+        Designed by Freepik
+      </a>
 
       <Button w={"100%"} px={10} py={6} h="50px" borderRadius={8} bg="#64B9FF" color="white" onClick={onNext}>
         Get Started
