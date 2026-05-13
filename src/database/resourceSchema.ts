@@ -1,24 +1,30 @@
 import mongoose, { Schema } from "mongoose";
+import { Tag } from "@/database/userSchema";
 
 export type IResources = {
   _id: string;
   title: string;
   description: string;
-  picture: string;
   location: string;
   link: string;
+  tags: string[];
 };
 
 const resourceSchema = new Schema(
   {
-    title: { type: String, required: true },
-    description: { type: String, required: true },
-    picture: { type: String, required: true },
-    location: { type: String, required: true },
-    link: { type: String, required: true },
+    title: { type: String, required: true, trim: true },
+    description: { type: String, required: true, trim: true },
+    location: { type: String, required: true, trim: true },
+    link: { type: String, required: true, trim: true },
+    tags: {
+      type: [String],
+      enum: Object.values(Tag),
+      default: [],
+    },
   },
   {
     collection: "devresources",
+    timestamps: true,
   },
 );
 
