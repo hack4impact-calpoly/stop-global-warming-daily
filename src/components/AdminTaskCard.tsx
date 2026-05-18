@@ -1,16 +1,46 @@
+"use client";
+
 import Divider from "./Divider";
 import { Collapsible, HStack, IconButton, Menu, Portal, Text, VStack } from "@chakra-ui/react";
+import { useRouter } from "next/navigation";
 import { LuEllipsisVertical } from "react-icons/lu";
 
 interface AdminTaskCardProps {
+  id: string;
   title: string;
   description: string;
   minEstimate?: number | null;
   availability: string;
+  onDelete: (taskId: string) => Promise<void>;
 }
 
-export default function AdminTaskCard({ title, description, minEstimate, availability }: AdminTaskCardProps) {
+export default function AdminTaskCard({
+  id,
+  title,
+  description,
+  minEstimate,
+  availability,
+  onDelete,
+}: AdminTaskCardProps) {
+  const router = useRouter();
   const estimateLabel = typeof minEstimate === "number" ? `~${minEstimate} min` : "Time TBD";
+
+  const handleEdit = () => {
+    router.push(`/admin/manage-tasks/new-tasks?taskId=${id}`);
+  };
+
+  const handleDelete = async () => {
+    const confirmed = window.confirm(`Are you sure you want to delete "${title}"?`);
+
+    if (!confirmed) return;
+
+    try {
+      await onDelete(id);
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+      alert("Failed to delete task. Please try again.");
+    }
+  };
 
   return (
     <Collapsible.Root>
@@ -21,23 +51,24 @@ export default function AdminTaskCard({ title, description, minEstimate, availab
         w="100%"
         gap={0}
         align="stretch"
-        boxShadow={"0px 1px 8px rgba(89, 91, 98, 0.1)"}
+        boxShadow="0px 1px 8px rgba(89, 91, 98, 0.1)"
       >
-        {/* Header */}
         <HStack h="100%" w="100%" align="flex-start" gap={2}>
           <Collapsible.Trigger transition="transform 0.2s" flex="1" w="100%">
             <VStack align="flex-start" gap={0} w="100%">
               <Text fontSize="lg" fontWeight="semibold">
                 {title}
               </Text>
+
               <Divider>
                 <Text fontSize="sm">{estimateLabel}</Text>
                 <Text fontSize="sm">{availability}</Text>
               </Divider>
+
               <Text
                 fontSize="sm"
                 w="100%"
-                textAlign={"start"}
+                textAlign="start"
                 color="gray.600"
                 css={{ WebkitLineClamp: 2, display: "-webkit-box", WebkitBoxOrient: "vertical" }}
               >
@@ -45,6 +76,7 @@ export default function AdminTaskCard({ title, description, minEstimate, availab
               </Text>
             </VStack>
           </Collapsible.Trigger>
+
           <Menu.Root>
             <Menu.Trigger asChild>
               <IconButton
@@ -59,17 +91,22 @@ export default function AdminTaskCard({ title, description, minEstimate, availab
                 <LuEllipsisVertical size="24px" />
               </IconButton>
             </Menu.Trigger>
+
             <Portal>
               <Menu.Positioner>
                 <Menu.Content>
-                  <Menu.Item value="edit-task">Edit</Menu.Item>
-                  <Menu.Item value="delete-task">Delete</Menu.Item>
+                  <Menu.Item value="edit-task" onClick={handleEdit}>
+                    Edit
+                  </Menu.Item>
+                  <Menu.Item value="delete-task" onClick={handleDelete}>
+                    Delete
+                  </Menu.Item>
                 </Menu.Content>
               </Menu.Positioner>
             </Portal>
           </Menu.Root>
         </HStack>
-        {/* Full Description */}
+
         <Collapsible.Content>
           <Text color="gray.600" fontSize="sm" pt={3}>
             {description}
