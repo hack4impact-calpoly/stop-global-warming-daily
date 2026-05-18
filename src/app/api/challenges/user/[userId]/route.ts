@@ -65,6 +65,7 @@ export async function GET(_req: Request, { params }: { params: { userId: string 
             points: task.time ?? task.points ?? 0,
             completed: assignment?.isComplete ?? false,
             dueDate: assignment?.date ?? new Date().toISOString(),
+            tags: Array.isArray(task.tags) ? task.tags : [],
           };
         })
         .filter(Boolean);

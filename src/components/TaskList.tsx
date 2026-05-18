@@ -11,6 +11,7 @@ export interface Task {
   description: string;
   minEstimate: number;
   completed: boolean;
+  tags: string[];
 }
 
 type TaskAssignmentResponse = {
@@ -25,6 +26,7 @@ type TaskResponse = {
   title: string;
   description: string;
   time: number;
+  tags?: string[];
 };
 
 type TaskListProps = {
@@ -87,6 +89,7 @@ export default function TaskList({ userId, showHeader = true }: TaskListProps) {
           description: taskData.description,
           minEstimate: taskData.time,
           completed: assignment.isComplete,
+          tags: Array.isArray(taskData.tags) ? taskData.tags : [],
         });
       } catch (error) {
         console.error("Failed to load daily task:", error);
@@ -143,6 +146,7 @@ export default function TaskList({ userId, showHeader = true }: TaskListProps) {
           description={task.description}
           minEstimate={task.minEstimate}
           completed={task.completed}
+          tags={task.tags}
           onSwipeRight={() => markComplete(task.id)}
           onSwipeLeft={() => markIncomplete(task.id)}
         />

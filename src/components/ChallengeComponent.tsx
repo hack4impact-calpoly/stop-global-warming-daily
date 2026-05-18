@@ -11,6 +11,7 @@ export type ChallengeTask = {
   points: number;
   completed: boolean;
   dueDate: string;
+  tags?: string[];
 };
 
 export type ChallengeSummary = {
@@ -117,6 +118,7 @@ export default function ChallengeComponent({
               description={task.description}
               minEstimate={task.points}
               completed={task.completed}
+              tags={task.tags ?? []}
               onSwipeRight={() => markComplete(task)}
               onSwipeLeft={() => markIncomplete(task)}
             />
