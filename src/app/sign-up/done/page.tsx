@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import { LuCheck } from "react-icons/lu";
 
 const AVATARS: string[] = [
-  "/avatars/avatar-1.png",
-  "/avatars/avatar-2.png",
-  "/avatars/avatar-3.png",
-  "/avatars/avatar-4.png",
-  "/avatars/avatar-5.png",
-  "/avatars/avatar-6.png",
+  "/images/profile-pictures/profile-picture-1.svg",
+  "/images/profile-pictures/profile-picture-2.svg",
+  "/images/profile-pictures/profile-picture-3.svg",
+  "/images/profile-pictures/profile-picture-4.svg",
+  "/images/profile-pictures/profile-picture-5.svg",
+  "/images/profile-pictures/profile-picture-6.svg",
+  "/images/profile-pictures/profile-picture-7.svg",
+  "/images/profile-pictures/profile-picture-8.svg",
 ];
 
 export default function Page() {
