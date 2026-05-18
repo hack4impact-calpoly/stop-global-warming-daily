@@ -10,6 +10,7 @@ interface SwipeableTaskCardProps {
   description: string;
   minEstimate: number;
   completed: boolean;
+  tags?: string[];
   onSwipeRight: () => void; // marks complete
   onSwipeLeft: () => void; // mark incomplete
 }
@@ -23,6 +24,7 @@ export default function SwipeableTaskCard({
   description,
   minEstimate,
   completed,
+  tags = [],
   onSwipeRight,
   onSwipeLeft,
 }: SwipeableTaskCardProps) {
@@ -161,7 +163,14 @@ export default function SwipeableTaskCard({
         onTouchMove={handleMove}
         onTouchEnd={handleEnd}
       >
-        <TaskCard date={date} title={title} description={description} minEstimate={minEstimate} completed={completed} />
+        <TaskCard
+          date={date}
+          title={title}
+          description={description}
+          minEstimate={minEstimate}
+          completed={completed}
+          tags={tags}
+        />
       </Box>
     </Box>
   );

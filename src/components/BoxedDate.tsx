@@ -8,18 +8,26 @@ interface BoxedDateProps {
 export default function BoxedDate({ date }: BoxedDateProps) {
   const dayAbbr = date.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase();
   const dayNum = date.getDate();
+
   return (
     <VStack
-      alignSelf="stretch"
+      align="center"
       justify="center"
-      bg="#E5E9F9"
+      bg="#E5EDF7"
       borderRadius="12px"
       fontWeight="bold"
-      minW="46px"
+      minW="68px"
+      minH="92px"
+      gap={1}
+      flexShrink={0}
       lineHeight={1}
     >
-      <Text fontSize="sm">{dayAbbr}</Text>
-      <Text fontSize="36px">{dayNum}</Text>
+      <Text fontSize="sm" lineHeight="1">
+        {dayAbbr}
+      </Text>
+      <Text fontSize="36px" lineHeight="1">
+        {dayNum}
+      </Text>
     </VStack>
   );
 }
