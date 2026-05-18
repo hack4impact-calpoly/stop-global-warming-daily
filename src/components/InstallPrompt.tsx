@@ -2,7 +2,6 @@
 
 import { IUsers } from "@/database/userSchema";
 import { useState, useEffect } from "react";
-// import { subscribeUser, unsubscribeUser, sendNotification } from "./actions";
 
 type InstallPromptProps = {
   userData: IUsers;
