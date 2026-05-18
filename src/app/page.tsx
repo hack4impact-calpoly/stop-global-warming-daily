@@ -128,17 +128,17 @@ export default function Home() {
 
           <VStack w={"full"} gap={5} py={"20px"}>
             <HStack w={"full"} justifyContent={"space-between"}>
-              <IconButton aria-label="Previous Progress Ring" variant={"ghost"}>
+              <IconButton aria-label="Previous Progress Ring" variant={"ghost"} size={"2xl"}>
                 <LuChevronLeft />
               </IconButton>
-              <Text fontSize={"x-large"} fontWeight={"semibold"}>
+              <Text fontSize={"42px"} fontWeight={"600"}>
                 Today
               </Text>
-              <IconButton aria-label="Next Progress Ring" variant={"ghost"}>
+              <IconButton aria-label="Next Progress Ring" variant={"ghost"} size={"2xl"}>
                 <LuChevronRight />
               </IconButton>
             </HStack>
-            <StreakCard />
+            <StreakCard streak={userData?.streak} completedDates={userData?.completedDates} />
           </VStack>
 
           {challenges.length > 0 && (
