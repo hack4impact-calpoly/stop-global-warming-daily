@@ -3,6 +3,7 @@ import { Types } from "mongoose";
 import connectDB from "@/database/db";
 import TaskAssignment from "@/database/taskAssignmentSchema";
 import User from "@/database/userSchema";
+import { calculateStreak, getDateKey } from "@/lib/streak";
 
 const getWeekStart = (date: Date) => {
   const start = new Date(date);
@@ -103,25 +104,41 @@ export async function PATCH(req: NextRequest, { params }: { params: { userId: st
     const updated = await TaskAssignment.findOneAndUpdate(filter, { $set: updates }, { new: true });
 
     if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
-
-    if (updated.isComplete === true) {
+    // streak update logic
+    if (!updated.challenge_id) {
       const user = await User.findById(params.userId);
-      const today = new Date();
-
       if (user) {
-        const todayStr = today.toDateString();
+        const today = new Date();
+        const todayKey = getDateKey(today);
 
-        const completedDates = user.completedDates || [];
+        const assignmentDate = new Date(updated.date);
+        const assignmentDateKey = getDateKey(assignmentDate);
 
-        const alreadyCompleted = completedDates.some((d: Date) => new Date(d).toDateString() === todayStr);
-
-        if (!alreadyCompleted) {
-          completedDates.push(today);
-          user.completedDates = completedDates;
-          user.streak = (user.streak || 0) + 1;
-
-          await user.save();
+        // only today's daily task should affect the streak
+        if (assignmentDateKey !== todayKey) {
+          return NextResponse.json(updated);
         }
+
+        let completedDates = user.completedDates || [];
+
+        const alreadyCompletedToday = completedDates.some((date: Date) => {
+          return getDateKey(new Date(date)) === todayKey;
+        });
+
+        if (updated.isComplete && !alreadyCompletedToday) {
+          completedDates.push(today);
+        }
+
+        if (!updated.isComplete) {
+          completedDates = completedDates.filter((date: Date) => {
+            return getDateKey(new Date(date)) !== todayKey;
+          });
+        }
+
+        user.completedDates = completedDates;
+        user.streak = calculateStreak(completedDates);
+
+        await user.save();
       }
     }
     return NextResponse.json(updated);

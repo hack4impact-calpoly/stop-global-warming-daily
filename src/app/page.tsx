@@ -20,7 +20,7 @@ export default function Home() {
   const { isSignedIn, user, isLoaded } = useUser();
   const [userData, setUserData] = useState<IUsers | null>(null);
   const [challenges, setChallenges] = useState<HydratedChallenge[]>([]);
-
+  const [refreshKey, setRefreshKey] = useState(0);
   const router = useRouter();
 
   // if user is not signed in redirect to login page
@@ -49,37 +49,13 @@ export default function Home() {
         const userObj: IUsers = await res.json();
         setUserData(userObj);
 
-        // check if user completed yesterday
-        const completedDates = userObj.completedDates ?? [];
-
-        if (completedDates.length > 0) {
-          const yesterday = new Date();
-          yesterday.setDate(yesterday.getDate() - 1);
-          yesterday.setHours(0, 0, 0, 0);
-
-          const didYesterday = completedDates.some((d) => {
-            const date = new Date(d);
-            date.setHours(0, 0, 0, 0);
-            return date.getTime() === yesterday.getTime();
-          });
-
-          if (!didYesterday && userObj.streak !== 0) {
-            await fetch(`/api/user/${userObj._id}`, {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ streak: 0 }),
-            });
-            setUserData({ ...userObj, streak: 0 });
-          }
-        }
-
         console.log("user is signed in!");
       }
     };
 
     if (!isLoaded) return;
     getUser();
-  }, [isLoaded, isSignedIn, user]);
+  }, [isLoaded, isSignedIn, user, refreshKey]);
 
   useEffect(() => {
     const getChallenges = async () => {
@@ -110,22 +86,9 @@ export default function Home() {
 
     getChallenges();
   }, [userData?._id]);
-  const refreshUser = async () => {
-    if (!user || !isSignedIn) return;
 
-    const email = encodeURIComponent(user.emailAddresses[0].emailAddress);
-    const res = await fetch(`/api/user/email/${email}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (!res.ok) {
-      setUserData(null);
-      return;
-    }
-
-    const userObj: IUsers = await res.json();
-    setUserData(userObj);
+  const refreshUser = () => {
+    setRefreshKey((prev) => prev + 1);
   };
   if (!isLoaded || !isSignedIn) {
     return null;
@@ -172,7 +135,7 @@ export default function Home() {
             </VStack>
           )}
 
-          <TaskList userId={userData ? String(userData._id) : undefined} onCompletionUpdated={refreshUser} />
+          <TaskList userId={userData ? String(userData._id) : undefined} onChange={refreshUser} />
         </VStack>
       </Box>
     </main>

@@ -32,10 +32,10 @@ type TaskResponse = {
 type TaskListProps = {
   userId?: string;
   showHeader?: boolean;
-  onCompletionUpdated?: () => void;
+  onChange?: () => void | Promise<void>;
 };
 
-export default function TaskList({ userId, showHeader = true, onCompletionUpdated }: TaskListProps) {
+export default function TaskList({ userId, showHeader = true, onChange }: TaskListProps) {
   const [task, setTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -117,7 +117,7 @@ export default function TaskList({ userId, showHeader = true, onCompletionUpdate
       });
 
       if (!res.ok) throw new Error("Failed to update task completion");
-      onCompletionUpdated?.();
+      await onChange?.();
     } catch (error) {
       console.error("Failed to update completion:", error);
       setTask((prev) => (prev ? { ...prev, completed: previousCompleted } : prev));
