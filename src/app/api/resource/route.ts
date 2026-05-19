@@ -8,7 +8,7 @@ export async function GET() {
   try {
     await connectDB();
 
-    const resources = await ResourceModel.find().sort({ _id: -1 });
+    const resources = await ResourceModel.find().sort({ createdAt: -1, _id: -1 });
 
     return NextResponse.json(resources, { status: 200 });
   } catch (error) {
