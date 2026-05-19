@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { subscribeUser, unsubscribeUser, sendNotification } from "app/actions";
 import { IUsers } from "@/database/userSchema";
+import { HStack, VStack, Text, Button, Heading } from "@chakra-ui/react";
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -140,12 +141,24 @@ export default function PushNotificationManager({ userData, setUserData }: PushN
   }
 
   return (
-    <div>
-      <h3>Push Notifications</h3>
-      <p>Would you like to subscribe to push notifications?</p>
-      <button onClick={subscribeToPush}>Subscribe</button>
-      <button onClick={noNotifications}>No Thanks</button>
-    </div>
+    <VStack
+      align="left"
+      marginTop={5}
+      padding={3}
+      background="white"
+      borderWidth={1}
+      borderRadius={"md"}
+      borderColor="black"
+    >
+      <Heading>Push Notifications</Heading>
+      <Text>Would you like to subscribe to push notifications?</Text>
+      <Button background="#2e86f2" onClick={subscribeToPush}>
+        Subscribe
+      </Button>
+      <Button background="#2e86f2" onClick={noNotifications}>
+        No Thanks
+      </Button>
+    </VStack>
   );
 }
 
