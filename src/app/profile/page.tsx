@@ -1,5 +1,5 @@
 "use client";
-import { Box, Text, VStack, HStack, IconButton, Skeleton } from "@chakra-ui/react";
+import { Box, Text, VStack, HStack, IconButton, Skeleton, Image } from "@chakra-ui/react";
 import {
   LuSettings,
   LuSquarePen,
@@ -14,13 +14,40 @@ import { SignOutButton } from "@clerk/nextjs";
 import { IconType } from "react-icons";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
+import { IUsers } from "@/database/userSchema";
+import { useEffect, useState } from "react";
 
 export default function Page() {
-  const { user } = useUser();
+  const { isLoaded, isSignedIn, user } = useUser();
+  const [userData, setUserData] = useState<IUsers | null>(null);
 
   // commented out for development
   // const isAdmin = user?.publicMetadata?.role === "admin";
   const isAdmin = true;
+
+  // load profile picture
+  useEffect(() => {
+    const getUser = async () => {
+      if (user && isSignedIn) {
+        const email = encodeURIComponent(user.emailAddresses[0].emailAddress);
+        const res = await fetch(`/api/user/email/${email}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!res.ok) {
+          return;
+        }
+
+        const userObj = await res.json();
+        setUserData(Array.isArray(userObj) ? (userObj[0] ?? null) : userObj);
+      }
+    };
+    if (!isLoaded) {
+      return;
+    }
+    getUser();
+  }, [isLoaded, isSignedIn, user]);
 
   return (
     <VStack display="flex" justifyContent="center" gap={30}>
@@ -39,7 +66,16 @@ export default function Page() {
         <HStack justifyContent="center" gap={5}>
           <Box position="relative" width="110px" height="110px">
             <Box bg="gray.200" w="100%" h="100%" borderRadius="full">
-              {/* IMAGE HERE */}
+              <Image
+                src={
+                  userData?.picture ? `${userData.picture}` : "/images/profile-pictures/profile-picture-8.svg" // default to blue
+                }
+                alt="Profile picture"
+                w="100%"
+                h="100%"
+                borderRadius="full"
+                objectFit="cover"
+              />
             </Box>
 
             <IconButton
@@ -106,12 +142,6 @@ export default function Page() {
 
         <VStack w="full" maxW="400px" bg="#F6F6F6" align="stretch" rounded="xl" gap={0}>
           <Card icon={LuSquarePen} label="Edit Profile" href="/profile/edit-profile" />
-          <Card icon={LuHeart} label="Change Interests" href="/profile/interests" />
-        </VStack>
-
-        <VStack w="full" maxW="400px" bg="#F6F6F6" align="stretch" rounded="xl" gap={0}>
-          <Card icon={LuBadgeCheck} label="View Badges" href="/profile/badges" />
-          <Card icon={LuFlame} label="Current Progress" href="/profile/progress" />
         </VStack>
 
         <Box w="full" maxW="400px" bg="#296184" textAlign={"center"} color="white" rounded="xl" p={4}>

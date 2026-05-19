@@ -135,8 +135,8 @@ export default function Page() {
             date={formatSingleDayLabel(selectedDate)}
             onPrevious={() => setSelectedDate((prev) => addDays(prev, -1))}
             onNext={() => setSelectedDate((prev) => addDays(prev, 1))}
-          ></CalendarSubHeader>
-          <DayView userData={userData} />
+          />
+          <DayView userData={userData} selectedDate={selectedDate} />
         </>
       );
     else if (selectCalendar === "W")
@@ -158,7 +158,7 @@ export default function Page() {
             onPrevious={() => setSelectedDate((prev) => addMonths(prev, -1))}
             onNext={() => setSelectedDate((prev) => addMonths(prev, 1))}
           ></CalendarSubHeader>
-          <MonthView />
+          <MonthView selectedDate={selectedDate} userId={userData ? String(userData._id) : undefined} />
         </>
       );
   };

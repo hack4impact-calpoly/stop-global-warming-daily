@@ -4,7 +4,9 @@ export type ITaskAssignment = {
   _id: Types.ObjectId;
   user_id: Types.ObjectId;
   task_id: Types.ObjectId;
-  date: Date;
+  challenge_id?: Types.ObjectId;
+  date?: Date;
+  isComplete: boolean;
 };
 
 const taskAssignmentSchema = new Schema(
@@ -19,9 +21,12 @@ const taskAssignmentSchema = new Schema(
       ref: "Task",
       required: true,
     },
+    challenge_id: {
+      type: Schema.Types.ObjectId,
+      ref: "Challenge",
+    },
     date: {
       type: Date,
-      required: true,
     },
     isComplete: {
       type: Boolean,
@@ -30,6 +35,16 @@ const taskAssignmentSchema = new Schema(
   },
   {
     collection: "devtaskassignments",
+  },
+);
+
+taskAssignmentSchema.index(
+  { challenge_id: 1, user_id: 1, task_id: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      challenge_id: { $exists: true },
+    },
   },
 );
 

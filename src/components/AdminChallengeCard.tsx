@@ -1,10 +1,10 @@
-import { HStack, Text, VStack, Collapsible, Menu, Portal, IconButton, Box } from "@chakra-ui/react";
+import { Collapsible, HStack, IconButton, Menu, Portal, Text, VStack } from "@chakra-ui/react";
 import { LuEllipsisVertical } from "react-icons/lu";
 
 interface AdminChallengeCardProps {
-  title: String; // Title of the challenge
-  description: String; // Description for the challenge
-  isActive: boolean; // flag to indicate if challange is active
+  title: string;
+  description: string;
+  isActive: boolean;
 }
 
 export default function AdminChallengeCard({ title, description, isActive }: AdminChallengeCardProps) {
@@ -20,23 +20,20 @@ export default function AdminChallengeCard({ title, description, isActive }: Adm
         boxShadow={"0px 1px 8px rgba(89, 91, 98, 0.1)"}
       >
         {/* Header */}
-        <HStack h="100%" w="100%" align="flex-start" gap={0} alignItems={"flex-start"}>
-          <Collapsible.Trigger transition="transform 0.2s">
-            <VStack align="flex-start" gap={0} flex={1}>
-              <HStack align="flex-start" justify="space-between" w="100%">
-                <VStack align="flex-start" gap={0}>
-                  <Text fontSize="lg" fontWeight="semibold">
-                    {title}
-                  </Text>
-                  <Text fontSize="sm" color={isActive ? "#ADEA9E" : "#EA9E9E"}>
-                    {isActive ? "Active" : "Inactive"}
-                  </Text>
-                </VStack>
-              </HStack>
+        <HStack h="100%" w="100%" align="flex-start" gap={2}>
+          <Collapsible.Trigger transition="transform 0.2s" flex="1" w="100%">
+            <VStack align="flex-start" gap={0} w="100%">
+              <Text fontSize="lg" fontWeight="semibold">
+                {title}
+              </Text>
+              <Text fontSize="sm" color={isActive ? "#ADEA9E" : "#EA9E9E"}>
+                {isActive ? "Active" : "Inactive"}
+              </Text>
               <Text
                 fontSize="sm"
                 w="100%"
                 textAlign={"start"}
+                color="gray.600"
                 css={{ WebkitLineClamp: 2, display: "-webkit-box", WebkitBoxOrient: "vertical" }}
               >
                 {description}
@@ -45,9 +42,17 @@ export default function AdminChallengeCard({ title, description, isActive }: Adm
           </Collapsible.Trigger>
           <Menu.Root>
             <Menu.Trigger asChild>
-              <Box mt={"30px"}>
+              <IconButton
+                aria-label={`Open actions for ${title}`}
+                variant="ghost"
+                size="sm"
+                alignSelf="flex-start"
+                flexShrink={0}
+                mt={1}
+                ml="auto"
+              >
                 <LuEllipsisVertical size="24px" />
-              </Box>
+              </IconButton>
             </Menu.Trigger>
             <Portal>
               <Menu.Positioner>
@@ -60,7 +65,11 @@ export default function AdminChallengeCard({ title, description, isActive }: Adm
           </Menu.Root>
         </HStack>
         {/* Full Description */}
-        <Collapsible.Content></Collapsible.Content>
+        <Collapsible.Content>
+          <Text color="gray.600" fontSize="sm" pt={3}>
+            {description}
+          </Text>
+        </Collapsible.Content>
       </VStack>
     </Collapsible.Root>
   );

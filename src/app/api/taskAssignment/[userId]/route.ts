@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Types } from "mongoose";
 import connectDB from "@/database/db";
 import TaskAssignment from "@/database/taskAssignmentSchema";
 import User from "@/database/userSchema";
+import { calculateStreak, getDateKey } from "@/lib/streak";
 
 const getWeekStart = (date: Date) => {
   const start = new Date(date);
@@ -30,7 +32,26 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
   try {
     await connectDB();
 
+    if (!Types.ObjectId.isValid(params.userId)) {
+      return NextResponse.json({ error: "Invalid user id" }, { status: 400 });
+    }
+
     const { searchParams } = new URL(req.url);
+    const challengeId = searchParams.get("challengeId");
+
+    if (challengeId) {
+      if (!Types.ObjectId.isValid(challengeId)) {
+        return NextResponse.json({ error: "Invalid challenge id" }, { status: 400 });
+      }
+
+      const challengeAssignments = await TaskAssignment.find({
+        user_id: params.userId,
+        challenge_id: challengeId,
+      }).sort({ _id: 1 });
+
+      return NextResponse.json(challengeAssignments, { status: 200 });
+    }
+
     const dateParam = searchParams.get("date");
     const range = searchParams.get("range") ?? "day";
     const baseDate = dateParam ? new Date(dateParam) : new Date();
@@ -41,6 +62,7 @@ export async function GET(req: NextRequest, { params }: { params: { userId: stri
 
     const taskAssignment = await TaskAssignment.find({
       user_id: params.userId,
+      challenge_id: { $exists: false },
       date: { $gte: startDate, $lt: endDate },
     }).sort({ date: 1 });
 
@@ -74,6 +96,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { userId: st
 
           return {
             user_id: params.userId,
+            challenge_id: { $exists: false },
             date: { $gte: today, $lt: tomorrow },
           };
         })();
@@ -81,25 +104,41 @@ export async function PATCH(req: NextRequest, { params }: { params: { userId: st
     const updated = await TaskAssignment.findOneAndUpdate(filter, { $set: updates }, { new: true });
 
     if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
-
-    if (updated.isComplete === true) {
+    // streak update logic
+    if (!updated.challenge_id) {
       const user = await User.findById(params.userId);
-      const today = new Date();
-
       if (user) {
-        const todayStr = today.toDateString();
+        const today = new Date();
+        const todayKey = getDateKey(today);
 
-        const completedDates = user.completedDates || [];
+        const assignmentDate = new Date(updated.date);
+        const assignmentDateKey = getDateKey(assignmentDate);
 
-        const alreadyCompleted = completedDates.some((d: Date) => new Date(d).toDateString() === todayStr);
-
-        if (!alreadyCompleted) {
-          completedDates.push(today);
-          user.completedDates = completedDates;
-          user.streak = (user.streak || 0) + 1;
-
-          await user.save();
+        // only today's daily task should affect the streak
+        if (assignmentDateKey !== todayKey) {
+          return NextResponse.json(updated);
         }
+
+        let completedDates = user.completedDates || [];
+
+        const alreadyCompletedToday = completedDates.some((date: Date) => {
+          return getDateKey(new Date(date)) === todayKey;
+        });
+
+        if (updated.isComplete && !alreadyCompletedToday) {
+          completedDates.push(today);
+        }
+
+        if (!updated.isComplete) {
+          completedDates = completedDates.filter((date: Date) => {
+            return getDateKey(new Date(date)) !== todayKey;
+          });
+        }
+
+        user.completedDates = completedDates;
+        user.streak = calculateStreak(completedDates);
+
+        await user.save();
       }
     }
     return NextResponse.json(updated);
@@ -120,6 +159,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { userId: s
 
     const deleted = await TaskAssignment.findOneAndDelete({
       user_id: params.userId,
+      challenge_id: { $exists: false },
       date: { $gte: today, $lt: tomorrow },
     });
 

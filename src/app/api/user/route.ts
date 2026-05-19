@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     const body = await req.json();
-    const { email, name, role } = body;
+    const { email, name, role, birthday, locationName, locationCoordinates, interests, focuses, picture } = body;
 
     if (!email || !name) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -19,6 +19,12 @@ export async function POST(req: NextRequest) {
       role: role ?? "user",
       streak: 0,
       completedDates: [],
+      birthday: birthday ?? null,
+      locationName: locationName ?? "",
+      locationCoordinates: locationCoordinates ?? [],
+      interests: interests ?? [],
+      focuses: focuses ?? [],
+      picture: picture ?? "",
     });
 
     return NextResponse.json(newUser, { status: 201 });

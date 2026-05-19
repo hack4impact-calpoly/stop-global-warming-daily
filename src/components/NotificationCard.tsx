@@ -1,4 +1,4 @@
-import { Box, Grid, HStack, IconButton, Text, VStack } from "@chakra-ui/react";
+import { Box, HStack, Text, VStack } from "@chakra-ui/react";
 
 type Props = {
   title: string;

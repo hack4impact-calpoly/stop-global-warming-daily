@@ -1,6 +1,5 @@
 "use client";
 import { Box, IconButton, Text, VStack, HStack } from "@chakra-ui/react";
-import ProgressRing from "@/components/ProgressRing";
 import ChallengeComponent, { ChallengeSummary, ChallengeTask } from "@/components/ChallengeComponent";
 import { LuChevronLeft, LuChevronRight, LuBell } from "react-icons/lu";
 import Link from "next/link";
@@ -10,13 +9,19 @@ import { useUser } from "@clerk/nextjs";
 import { IUsers } from "@/database/userSchema";
 import { useRouter } from "next/navigation";
 import StreakCard from "@/components/StreakCard";
+
+type HydratedChallenge = ChallengeSummary & {
+  tasks: ChallengeTask[];
+  completionPercentage: number;
+};
 import PushNotificationManager from "@/components/PushNotificationManager";
 import InstallPrompt from "@/components/InstallPrompt";
 
 export default function Home() {
   const { isSignedIn, user, isLoaded } = useUser();
   const [userData, setUserData] = useState<IUsers | null>(null);
-
+  const [challenges, setChallenges] = useState<HydratedChallenge[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0);
   const router = useRouter();
 
   // if user is not signed in redirect to login page
@@ -41,42 +46,54 @@ export default function Home() {
           setUserData(null);
           return;
         }
+
         const userObj: IUsers = await res.json();
         setUserData(userObj);
-
-        // check if user completed yesterday
-        const completedDates = userObj.completedDates ?? [];
-
-        if (completedDates.length > 0) {
-          const yesterday = new Date();
-          yesterday.setDate(yesterday.getDate() - 1);
-          yesterday.setHours(0, 0, 0, 0);
-
-          const didYesterday = completedDates.some((d) => {
-            const date = new Date(d);
-            date.setHours(0, 0, 0, 0);
-            return date.getTime() === yesterday.getTime();
-          });
-
-          if (!didYesterday && userObj.streak !== 0) {
-            await fetch(`/api/user/${userObj._id}`, {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ streak: 0 }),
-            });
-          }
-        }
 
         console.log("user is signed in!");
       }
     };
-    if (!isLoaded) {
-      return;
-    }
-    // get user
-    getUser();
-  }, [isLoaded, isSignedIn, user]);
 
+    if (!isLoaded) return;
+    getUser();
+  }, [isLoaded, isSignedIn, user, refreshKey]);
+
+  useEffect(() => {
+    const getChallenges = async () => {
+      if (!userData?._id) {
+        setChallenges([]);
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/challenges/user/${userData._id}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!res.ok) {
+          setChallenges([]);
+          return;
+        }
+
+        const challengeData: HydratedChallenge[] = await res.json();
+        console.log("challengeData", challengeData);
+        setChallenges(challengeData);
+      } catch (error) {
+        console.error(error);
+        setChallenges([]);
+      }
+    };
+
+    getChallenges();
+  }, [userData?._id]);
+
+  const refreshUser = () => {
+    setRefreshKey((prev) => prev + 1);
+  };
+  if (!isLoaded || !isSignedIn) {
+    return null;
+  }
   return (
     <main>
       <Box display={"flex"} justifyContent={"center"}>
@@ -95,23 +112,37 @@ export default function Home() {
             )}
             {userData && !userData.installationAsked && <InstallPrompt userData={userData} setUserData={setUserData} />}
           </div>
-          {/* Progress Ring */}
+
           <VStack w={"full"} gap={5} py={"20px"}>
             <HStack w={"full"} justifyContent={"space-between"}>
-              <IconButton area-label="Previous Progress Ring" variant={"ghost"}>
+              <IconButton aria-label="Previous Progress Ring" variant={"ghost"} size={"2xl"}>
                 <LuChevronLeft />
               </IconButton>
-              <Text fontSize={"x-large"} fontWeight={"semibold"}>
+              <Text fontSize={"42px"} fontWeight={"600"}>
                 Today
               </Text>
-              <IconButton area-label="Next Progress Ring" variant={"ghost"}>
+              <IconButton aria-label="Next Progress Ring" variant={"ghost"} size={"2xl"}>
                 <LuChevronRight />
               </IconButton>
             </HStack>
-            <StreakCard></StreakCard>
+            <StreakCard streak={userData?.streak} completedDates={userData?.completedDates} />
           </VStack>
-          {/* Tasks */}
-          <TaskList userId={userData ? String(userData._id) : undefined} />
+
+          {challenges.length > 0 && (
+            <VStack w="full" align="stretch" gap={3}>
+              {challenges.map((challenge) => (
+                <ChallengeComponent
+                  key={challenge._id}
+                  challenge={challenge}
+                  tasks={challenge.tasks}
+                  completionPercentage={challenge.completionPercentage}
+                  userId={userData ? String(userData._id) : undefined}
+                />
+              ))}
+            </VStack>
+          )}
+
+          <TaskList userId={userData ? String(userData._id) : undefined} onChange={refreshUser} />
         </VStack>
       </Box>
     </main>
