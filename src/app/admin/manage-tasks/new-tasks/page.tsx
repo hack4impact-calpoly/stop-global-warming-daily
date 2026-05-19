@@ -1,14 +1,23 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Box, Text, VStack, HStack, Input, Textarea, Button } from "@chakra-ui/react";
 import { LuChevronLeft, LuCheck } from "react-icons/lu";
 
 type AvailableTag = {
   label: string;
   color: string;
+};
+
+type TaskFormResponse = {
+  _id?: string;
+  title?: string;
+  description?: string;
+  time?: number;
+  tags?: string[];
+  error?: string;
 };
 
 type TimeValidationResult =
@@ -31,8 +40,12 @@ const AVAILABLE_TAGS: AvailableTag[] = [
   { label: "Nature Preservation & Restoration", color: "green.500" },
 ];
 
-export default function NewTaskPage() {
+function NewTaskForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const taskId = searchParams.get("taskId");
+  const isEditMode = Boolean(taskId);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -45,6 +58,40 @@ export default function NewTaskPage() {
 
   const visibleTags = showAllTags ? AVAILABLE_TAGS : AVAILABLE_TAGS.slice(0, 5);
   const hiddenCount = AVAILABLE_TAGS.length - 5;
+
+  useEffect(() => {
+    if (!taskId) return;
+
+    const fetchTask = async () => {
+      setError("");
+
+      try {
+        const response = await fetch(`/api/task/${taskId}`, {
+          cache: "no-store",
+        });
+
+        const data: TaskFormResponse | null = await response.json().catch(() => null);
+
+        if (!response.ok || !data) {
+          throw new Error(data?.error ?? "Failed to load task.");
+        }
+
+        const totalMinutes = typeof data.time === "number" ? data.time : 0;
+
+        setTitle(data.title ?? "");
+        setDescription(data.description ?? "");
+        setSelectedTags(Array.isArray(data.tags) ? data.tags : []);
+        setHours(String(Math.floor(totalMinutes / 60)));
+        setMinutes(String(totalMinutes % 60));
+        setShowAllTags(true);
+      } catch (fetchError) {
+        console.error("Failed to load task:", fetchError);
+        setError(fetchError instanceof Error ? fetchError.message : "Unable to load task.");
+      }
+    };
+
+    fetchTask();
+  }, [taskId]);
 
   const toggleTag = (label: string) => {
     setSelectedTags((prev) => (prev.includes(label) ? prev.filter((tag) => tag !== label) : [...prev, label]));
@@ -121,8 +168,8 @@ export default function NewTaskPage() {
     setError("");
 
     try {
-      const response = await fetch("/api/task", {
-        method: "POST",
+      const response = await fetch(isEditMode && taskId ? `/api/task/${taskId}` : "/api/task", {
+        method: isEditMode ? "PATCH" : "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -134,17 +181,19 @@ export default function NewTaskPage() {
         }),
       });
 
-      const data = await response.json().catch(() => null);
+      const data: TaskFormResponse | null = await response.json().catch(() => null);
 
       if (!response.ok) {
-        throw new Error(data?.error ?? "Failed to create task.");
+        throw new Error(data?.error ?? `Failed to ${isEditMode ? "update" : "create"} task.`);
       }
 
       router.push("/admin/manage-tasks");
       router.refresh();
     } catch (submitError) {
-      console.error("Failed to create task:", submitError);
-      setError(submitError instanceof Error ? submitError.message : "Failed to create task.");
+      console.error(`Failed to ${isEditMode ? "update" : "create"} task:`, submitError);
+      setError(
+        submitError instanceof Error ? submitError.message : `Failed to ${isEditMode ? "update" : "create"} task.`,
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -160,7 +209,7 @@ export default function NewTaskPage() {
                 <LuChevronLeft size={28} />
               </Link>
               <Text fontWeight="semibold" fontSize="4xl">
-                New Task
+                {isEditMode ? "Edit Task" : "New Task"}
               </Text>
             </HStack>
 
@@ -310,5 +359,13 @@ export default function NewTaskPage() {
         </form>
       </Box>
     </Box>
+  );
+}
+
+export default function NewTaskPage() {
+  return (
+    <Suspense fallback={null}>
+      <NewTaskForm />
+    </Suspense>
   );
 }

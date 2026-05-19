@@ -93,6 +93,20 @@ export default function ManageTasksPage() {
 
   const filteredTasks = tasks.filter((task) => task.title.toLowerCase().includes(searchTerm.trim().toLowerCase()));
 
+  const handleDeleteTask = async (taskId: string) => {
+    const response = await fetch(`/api/task/${taskId}`, {
+      method: "DELETE",
+    });
+
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      throw new Error(data?.error ?? "Failed to delete task.");
+    }
+
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+  };
+
   const renderTaskContent = () => {
     if (isLoading) {
       return (
@@ -129,10 +143,12 @@ export default function ManageTasksPage() {
     return filteredTasks.map((task) => (
       <AdminTaskCard
         key={task.id}
+        id={task.id}
         title={task.title}
         description={task.description}
         minEstimate={task.minEstimate}
         availability={task.availability}
+        onDelete={handleDeleteTask}
       />
     ));
   };
@@ -173,10 +189,12 @@ export default function ManageTasksPage() {
               <LuSearch />
             </Box>
           </Box>
+
           <VStack align="stretch" gap={3}>
             {renderTaskContent()}
           </VStack>
         </VStack>
+
         <Link href="/admin/manage-tasks/new-tasks">
           <IconButton
             aria-label="Add task"
