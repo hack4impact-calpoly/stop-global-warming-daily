@@ -65,14 +65,6 @@ export default function TaskCardExpanded({
           </Text>
         </VStack>
 
-        {/* More Text Descriptions placeholder*/}
-        <VStack align="flex-start" gap={0}>
-          <Text fontSize="sm" fontWeight="bold">
-            Why this task matters:
-          </Text>
-          <Text fontSize="sm">Doing this task can lower your carbon footprint by X%.</Text>
-        </VStack>
-
         {/* Completed button placeholder*/}
         <Button
           w="100%"

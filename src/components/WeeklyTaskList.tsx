@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Text, VStack } from "@chakra-ui/react";
 import SwipeableTaskCard from "@/components/SwipeableTaskCard";
+import TaskCard from "@/components/TaskCard";
 
 type TaskAssignmentResponse = {
   _id: string;
@@ -150,15 +151,15 @@ export default function WeeklyTaskList({ userId, referenceDate }: WeeklyTaskList
     <VStack align="stretch" w="full" pt={2}>
       {tasks.length > 0 ? (
         tasks.map((task) => (
-          <SwipeableTaskCard
+          <TaskCard
             key={task.assignmentId}
             date={task.date}
             title={task.title}
             description={task.description}
             minEstimate={task.minEstimate}
             completed={task.completed}
-            onSwipeRight={() => markComplete(task.assignmentId)}
-            onSwipeLeft={() => markIncomplete(task.assignmentId)}
+            // onSwipeRight={() => markComplete(task.assignmentId)}
+            // onSwipeLeft={() => markIncomplete(task.assignmentId)}
           />
         ))
       ) : (
