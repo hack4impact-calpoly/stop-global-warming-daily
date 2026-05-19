@@ -170,7 +170,15 @@ export default function Page() {
           {/* Profile Info */}
           <VStack align="center" gap={3}>
             <Box w="88px" h="88px" borderRadius="full" overflow="hidden" bg="#E8F1F8">
-              <Image src={userData?.picture} alt="Profile picture" w="100%" h="100%" objectFit="cover" />
+              <Image
+                src={
+                  userData?.picture ? `${userData.picture}` : "/images/profile-pictures/profile-picture-8.svg" // default to blue
+                }
+                alt="Profile picture"
+                w="100%"
+                h="100%"
+                objectFit="cover"
+              />
             </Box>
 
             <VStack gap={0}>
