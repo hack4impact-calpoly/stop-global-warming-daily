@@ -1,5 +1,4 @@
 "use client";
-
 import { Box, IconButton, Text, VStack, HStack } from "@chakra-ui/react";
 import ChallengeComponent, { ChallengeSummary, ChallengeTask } from "@/components/ChallengeComponent";
 import { LuChevronLeft, LuChevronRight, LuBell } from "react-icons/lu";
