@@ -26,6 +26,8 @@ export interface IUsers {
   locationName?: string;
   locationCoordinates: number[];
   interests: string[];
+  focuses: string[];
+  picture: string;
 }
 
 const UserSchema = new Schema(
@@ -74,6 +76,17 @@ const UserSchema = new Schema(
       type: [String],
       enum: Object.values(Tag),
       default: [],
+    },
+
+    focuses: {
+      type: [String],
+      default: [],
+    },
+
+    picture: {
+      type: String,
+      trim: true,
+      default: "",
     },
   },
   { timestamps: true },

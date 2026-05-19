@@ -8,12 +8,14 @@ import { LuCheck } from "react-icons/lu";
 import { useSignUp } from "@clerk/nextjs";
 
 const AVATARS: string[] = [
-  "/avatars/avatar-1.png",
-  "/avatars/avatar-2.png",
-  "/avatars/avatar-3.png",
-  "/avatars/avatar-4.png",
-  "/avatars/avatar-5.png",
-  "/avatars/avatar-6.png",
+  "/images/profile-pictures/profile-picture-1.svg",
+  "/images/profile-pictures/profile-picture-2.svg",
+  "/images/profile-pictures/profile-picture-3.svg",
+  "/images/profile-pictures/profile-picture-4.svg",
+  "/images/profile-pictures/profile-picture-5.svg",
+  "/images/profile-pictures/profile-picture-6.svg",
+  "/images/profile-pictures/profile-picture-7.svg",
+  "/images/profile-pictures/profile-picture-8.svg",
 ];
 
 export default function Page() {
@@ -45,6 +47,8 @@ export default function Page() {
           locationName: savedUser?.locationName,
           locationCoordinates: savedUser?.locationCoordinates,
           interests: savedUser?.interests,
+          focuses: savedUser?.focuses ?? [],
+          picture: selected,
         };
 
         let res = await fetch("/api/user", {
@@ -81,7 +85,7 @@ export default function Page() {
           Choose your profile picture!
         </Text>
 
-        <SimpleGrid columns={3} gap={4} w="100%">
+        <SimpleGrid columns={4} gap={4} w="100%">
           {AVATARS.map((src) => {
             const isSelected = selected === src;
             return (
@@ -104,14 +108,14 @@ export default function Page() {
                   bg="#E8F1F8"
                 >
                   {/* IMAGE GOES HERE */}
-                  {/* <Image src={src} alt={`Avatar option`} w="100%" h="100%" objectFit="cover" /> */}
+                  <Image src={src} alt={`Avatar option`} w="100%" h="100%" objectFit="cover" />
                 </Box>
 
                 {isSelected && (
                   <Box
                     position="absolute"
                     top={"0px"}
-                    right="15px"
+                    right="5px"
                     w="20px"
                     h="20px"
                     borderRadius="full"
