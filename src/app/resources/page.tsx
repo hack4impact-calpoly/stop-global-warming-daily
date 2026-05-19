@@ -304,6 +304,7 @@ export default function Page() {
                 key={resource._id}
                 title={resource.title}
                 description={resource.description}
+                link={resource.link}
                 interestTags={resource.tags ?? []}
                 variant={activeTab}
                 onSave={() => handleSave(resource._id)}
