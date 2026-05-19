@@ -66,6 +66,8 @@ export default function Page() {
         locationCoordinates: userObj.locationCoordinates || [],
       });
 
+      setNotifications(userObj.notificationsEnabled);
+
       setInterests(userObj.interests || []);
     };
 
@@ -134,6 +136,7 @@ export default function Page() {
           locationName: finalLocationName,
           locationCoordinates: finalLocationCoordinates,
           interests,
+          notificationsEnabled: notifications,
         }),
       });
 
