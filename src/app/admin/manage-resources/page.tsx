@@ -4,6 +4,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { Box, Text, VStack, HStack, Input, IconButton } from "@chakra-ui/react";
 import { LuChevronLeft, LuSearch, LuPlus } from "react-icons/lu";
+import AdminResourceCard from "@/components/AdminResourceCard";
 
 type ResourceResponse = {
   _id: string;
@@ -69,6 +70,20 @@ export default function ManageResourcesPage() {
     resource.title.toLowerCase().includes(searchTerm.trim().toLowerCase()),
   );
 
+  const handleDeleteResource = async (resourceId: string) => {
+    const response = await fetch(`/api/resource/${resourceId}`, {
+      method: "DELETE",
+    });
+
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      throw new Error(data?.error ?? "Failed to delete resource.");
+    }
+
+    setResources((prevResources) => prevResources.filter((resource) => resource.id !== resourceId));
+  };
+
   const renderResourceContent = () => {
     if (isLoading) {
       return (
@@ -103,33 +118,16 @@ export default function ManageResourcesPage() {
     }
 
     return filteredResources.map((resource) => (
-      <Box key={resource.id} bg="white" borderRadius="xl" p={4} shadow="sm">
-        <VStack align="stretch" gap={2}>
-          <Text fontWeight="bold" fontSize="lg">
-            {resource.title}
-          </Text>
-
-          <Text fontSize="sm" color="gray.700">
-            {resource.description}
-          </Text>
-
-          <Text fontSize="sm" color="gray.600">
-            {resource.location}
-          </Text>
-
-          {resource.tags.length > 0 && (
-            <Text fontSize="sm" color="gray.600">
-              Tags: {resource.tags.join(", ")}
-            </Text>
-          )}
-
-          {resource.link && (
-            <Text fontSize="sm" color="blue.500" overflow="hidden" textOverflow="ellipsis">
-              {resource.link}
-            </Text>
-          )}
-        </VStack>
-      </Box>
+      <AdminResourceCard
+        key={resource.id}
+        id={resource.id}
+        title={resource.title}
+        description={resource.description}
+        location={resource.location}
+        link={resource.link}
+        tags={resource.tags}
+        onDelete={handleDeleteResource}
+      />
     ));
   };
 
