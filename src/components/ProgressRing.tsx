@@ -1,13 +1,10 @@
-import { Box, Text, ProgressCircle, AbsoluteCenter, Icon } from "@chakra-ui/react";
-import { FaFire } from "react-icons/fa";
+import { ProgressCircle, AbsoluteCenter, Image } from "@chakra-ui/react";
 
-//// Custom progress ring component configurable with size, thickness, and direction of progress indicator
 export default function ProgressRing({ percent = 0, isClockwise = true, size = "270px", thickness = "30px" }) {
-  // Clamp to 0 to 100 range
   const clampedPercent = Math.min(Math.max(percent, 0), 100);
 
   return (
-    <ProgressCircle.Root value={clampedPercent} colorPalette={"cyan"}>
+    <ProgressCircle.Root value={clampedPercent}>
       <ProgressCircle.Circle
         style={
           {
@@ -17,11 +14,18 @@ export default function ProgressRing({ percent = 0, isClockwise = true, size = "
           } as React.CSSProperties
         }
       >
-        <ProgressCircle.Track />
-        <ProgressCircle.Range strokeLinecap="round" />
+        <defs>
+          <linearGradient id="progress-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#057CC6" />
+            <stop offset="100%" stopColor="#64B9FF" />
+          </linearGradient>
+        </defs>
+        <ProgressCircle.Track stroke="#E8F1F8" />
+        <ProgressCircle.Range stroke="url(#progress-gradient)" strokeLinecap="round" />
       </ProgressCircle.Circle>
+
       <AbsoluteCenter>
-        <Icon as={FaFire} boxSize={16} color="cyan.600" />
+        <Image src="/images/flame.svg" alt="streak-flame" h={75} w={70} />
       </AbsoluteCenter>
     </ProgressCircle.Root>
   );
