@@ -1,141 +1,235 @@
 "use client";
-import { Box, Text, VStack, HStack, IconButton, Skeleton } from "@chakra-ui/react";
-import {
-  LuSettings,
-  LuSquarePen,
-  LuChevronRight,
-  LuHeart,
-  LuShieldCheck,
-  LuCamera,
-  LuBadgeCheck,
-  LuFlame,
-} from "react-icons/lu";
-import { SignOutButton } from "@clerk/nextjs";
-import { IconType } from "react-icons";
-import { useUser } from "@clerk/nextjs";
+
+import { Box, Button, HStack, Image, Switch, Text, VStack } from "@chakra-ui/react";
+import { LuChevronLeft } from "react-icons/lu";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useUser } from "@clerk/nextjs";
+import { IUsers } from "@/database/userSchema";
+import { useRouter } from "next/navigation";
+import ProfileDetailsForm, { ProfileDetailsValue } from "@/components/ProfileDetailsForm";
+import ProfileInterestsForm from "@/components/ProfileInterestsForm";
+import { findLocation } from "@/lib/findLocation";
 
 export default function Page() {
-  const { user } = useUser();
+  const { isSignedIn, user, isLoaded } = useUser();
+  const [userData, setUserData] = useState<IUsers | null>(null);
 
-  // commented out for development
-  // const isAdmin = user?.publicMetadata?.role === "admin";
-  const isAdmin = true;
+  const [profileDetails, setProfileDetails] = useState<ProfileDetailsValue>({
+    birthday: undefined,
+    locationName: "",
+    locationCoordinates: [],
+  });
+
+  const [interests, setInterests] = useState<string[]>([]);
+  const [notifications, setNotifications] = useState(false);
+
+  const [errors, setErrors] = useState({
+    birthday: "",
+    location: "",
+  });
+
+  const [isSaving, setIsSaving] = useState(false);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    if (!isSignedIn) {
+      router.push("/login");
+    }
+  }, [isLoaded, isSignedIn, router]);
+
+  useEffect(() => {
+    const getUser = async () => {
+      if (!user || !isSignedIn) return;
+
+      const email = encodeURIComponent(user.emailAddresses[0].emailAddress);
+
+      const res = await fetch(`/api/user/email/${email}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) {
+        setUserData(null);
+        return;
+      }
+
+      const userObj: IUsers = await res.json();
+      setUserData(userObj);
+
+      setProfileDetails({
+        birthday: userObj.birthday ? new Date(userObj.birthday) : undefined,
+        locationName: userObj.locationName || "",
+        locationCoordinates: userObj.locationCoordinates || [],
+      });
+
+      setInterests(userObj.interests || []);
+    };
+
+    if (!isLoaded) return;
+    getUser();
+  }, [isLoaded, isSignedIn, user]);
+
+  const handleSave = async () => {
+    setErrors({
+      birthday: "",
+      location: "",
+    });
+
+    if (!profileDetails.birthday) {
+      setErrors((prev) => ({
+        ...prev,
+        birthday: "Please select your full birthday.",
+      }));
+      return;
+    }
+
+    if (!profileDetails.locationName.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        location: "Please enter a location.",
+      }));
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+
+      let finalLocationName = profileDetails.locationName;
+      let finalLocationCoordinates = profileDetails.locationCoordinates;
+
+      // If the user typed a location but did not click the pin,
+      // find the coordinates before saving.
+      if (finalLocationCoordinates.length === 0) {
+        const result = await findLocation(profileDetails.locationName);
+
+        if (!result) {
+          setErrors((prev) => ({
+            ...prev,
+            location: "Please choose a valid location.",
+          }));
+          return;
+        }
+
+        finalLocationName = result.locationName;
+        finalLocationCoordinates = result.locationCoordinates;
+
+        setProfileDetails((prev) => ({
+          ...prev,
+          locationName: result.locationName,
+          locationCoordinates: result.locationCoordinates,
+        }));
+      }
+
+      const email = encodeURIComponent(user?.emailAddresses[0].emailAddress || "");
+
+      const res = await fetch(`/api/user/${userData?._id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          birthday: profileDetails.birthday,
+          locationName: finalLocationName,
+          locationCoordinates: finalLocationCoordinates,
+          interests,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to update profile.");
+      }
+
+      router.push("/profile");
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (!isLoaded || !isSignedIn) {
+    return null;
+  }
 
   return (
-    <VStack display="flex" justifyContent="center" gap={30}>
-      <VStack maxW="400px" align="stretch" w="full" gap={2} p={5}>
+    <Box display="flex" justifyContent="center" h={"100%"} w={"100%"}>
+      <VStack align="stretch" w="full" gap={2} p={5}>
         {/* Header */}
-        <HStack w="full" justifyContent="space-between">
-          <Text fontWeight="semibold" fontSize="4xl">
-            Account
-          </Text>
-          <Link href="/settings" style={{ display: "flex", cursor: "pointer" }}>
-            <LuSettings size={30} />
+        <HStack position={"sticky"} gap={3}>
+          <Link href="/profile" style={{ display: "flex", alignItems: "center" }}>
+            <LuChevronLeft size={28} />
           </Link>
+          <Text fontWeight="semibold" fontSize="4xl">
+            Edit Profile
+          </Text>
         </HStack>
 
-        {/* Profile */}
-        <HStack justifyContent="center" gap={5}>
-          <Box position="relative" width="110px" height="110px">
-            <Box bg="gray.200" w="100%" h="100%" borderRadius="full">
-              {/* IMAGE HERE */}
+        <VStack align="stretch" w="full" gap={6} px={5} pt={8} pb={8}>
+          {/* Profile Info */}
+          <VStack align="center" gap={3}>
+            <Box w="88px" h="88px" borderRadius="full" overflow="hidden" bg="#E8F1F8">
+              <Image src={userData?.picture} alt="Profile picture" w="100%" h="100%" objectFit="cover" />
             </Box>
 
-            <IconButton
-              aria-label="Change profile photo"
-              variant="outline"
-              size="sm"
-              borderRadius="full"
-              position="absolute"
-              bottom="0"
-              right="0"
-              bg="#F9FAFB"
-              borderColor="#3B3B3B"
-              borderWidth={2}
-            >
-              <LuCamera color="#3B3B3B" />
-            </IconButton>
-          </Box>
-
-          <VStack gap={0} align="stretch" minW="200px">
-            <Skeleton loading={!user} height="7" rounded="md">
-              <Text fontWeight="bold" fontSize="2xl">
-                {user?.fullName ?? ""}
-                {isAdmin && (
-                  <Box as="span" display="inline-block" ml={2} verticalAlign="baseline">
-                    <LuShieldCheck size={18} />
-                  </Box>
-                )}
+            <VStack gap={0}>
+              <Text fontSize="20px" fontWeight="semibold">
+                {userData?.name || user?.fullName}
               </Text>
-            </Skeleton>
 
-            <Skeleton loading={!user} height="4" mt={1} rounded="md">
-              <Text fontWeight="normal" fontSize="xs">
-                {user?.primaryEmailAddress?.emailAddress ?? "loading@email.com"}
+              <Text fontSize="14px" color="#A9AEB1">
+                {user?.emailAddresses[0].emailAddress}
               </Text>
-            </Skeleton>
+            </VStack>
           </VStack>
-        </HStack>
-      </VStack>
 
-      {/* Options */}
-      <VStack
-        w="100%"
-        h="100%"
-        alignItems="center"
-        bg="white"
-        align="stretch"
-        gap={5}
-        p={5}
-        borderRadius="20px 20px 0 0"
-      >
-        {isAdmin && (
-          <Link href="/admin" style={{ width: "100%", maxWidth: "400px" }}>
-            <HStack bg="#F6F6F6" w="full" justifyContent="space-between" rounded="xl" p={5} pl={8}>
-              <HStack gap={3}>
-                <LuShieldCheck size={35} />
-                <Text fontWeight="normal" fontSize="lg">
-                  Admin Settings
-                </Text>
-              </HStack>
-              <LuChevronRight size={25} />
-            </HStack>
-          </Link>
-        )}
+          <ProfileDetailsForm
+            value={profileDetails}
+            onChange={setProfileDetails}
+            errors={errors}
+            onClearError={(field) => {
+              setErrors((prev) => ({
+                ...prev,
+                [field]: "",
+              }));
+            }}
+          />
 
-        <VStack w="full" maxW="400px" bg="#F6F6F6" align="stretch" rounded="xl" gap={0}>
-          <Card icon={LuSquarePen} label="Edit Profile" href="/profile/edit-profile" />
-          <Card icon={LuHeart} label="Change Interests" href="/profile/interests" />
+          <ProfileInterestsForm selectedInterests={interests} onInterestsChange={setInterests} />
+
+          {/* Notifications */}
+          <HStack w="100%" justify="space-between" py={2}>
+            <VStack align="start" gap={0}>
+              <Text fontSize="16px" fontWeight="semibold">
+                Notifications
+              </Text>
+
+              <Text color="#A9AEB1" fontSize="12px"></Text>
+            </VStack>
+
+            <Switch.Root checked={notifications} onCheckedChange={(e) => setNotifications(e.checked)}>
+              <Switch.HiddenInput />
+              <Switch.Control>
+                <Switch.Thumb />
+              </Switch.Control>
+            </Switch.Root>
+          </HStack>
+
+          <Button
+            p={"15px 40px"}
+            h={"45px"}
+            borderRadius={8}
+            bg="#64B9FF"
+            color="white"
+            border={"1px solid #64B9FF"}
+            loading={isSaving}
+            onClick={handleSave}
+          >
+            Save Changes
+          </Button>
         </VStack>
-
-        <VStack w="full" maxW="400px" bg="#F6F6F6" align="stretch" rounded="xl" gap={0}>
-          <Card icon={LuBadgeCheck} label="View Badges" href="/profile/badges" />
-          <Card icon={LuFlame} label="Current Progress" href="/profile/progress" />
-        </VStack>
-
-        <Box w="full" maxW="400px" bg="#296184" textAlign={"center"} color="white" rounded="xl" p={4}>
-          <SignOutButton />
-        </Box>
       </VStack>
-    </VStack>
-  );
-}
-
-function Card({ icon: Icon, label, href }: { icon: IconType; label: string; href: string }) {
-  return (
-    <Link href={href}>
-      <HStack w="full" justifyContent="space-between" paddingLeft={"50px"} pl={8} pr={4} py={4} rounded="xl">
-        <HStack gap={3}>
-          <Box bg="#DEDEDE" p={2} borderRadius="full" boxShadow="sm">
-            <Icon size={20} />
-          </Box>
-          <Text fontWeight="normal" fontSize="md">
-            {label}
-          </Text>
-        </HStack>
-        <LuChevronRight size={25} />
-      </HStack>
-    </Link>
+    </Box>
   );
 }

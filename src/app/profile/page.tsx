@@ -142,12 +142,12 @@ export default function Page() {
 
         <VStack w="full" maxW="400px" bg="#F6F6F6" align="stretch" rounded="xl" gap={0}>
           <Card icon={LuSquarePen} label="Edit Profile" href="/profile/edit-profile" />
-          <Card icon={LuHeart} label="Change Interests" href="/profile/interests" />
+          <Card icon={LuHeart} label="Change Interests" href="/profile/" />
         </VStack>
 
         <VStack w="full" maxW="400px" bg="#F6F6F6" align="stretch" rounded="xl" gap={0}>
-          <Card icon={LuBadgeCheck} label="View Badges" href="/profile/badges" />
-          <Card icon={LuFlame} label="Current Progress" href="/profile/progress" />
+          <Card icon={LuBadgeCheck} label="View Badges" href="/profile/" />
+          <Card icon={LuFlame} label="Current Progress" href="/profile/" />
         </VStack>
 
         <Box w="full" maxW="400px" bg="#296184" textAlign={"center"} color="white" rounded="xl" p={4}>
