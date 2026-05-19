@@ -69,6 +69,7 @@ export default function Home() {
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ streak: 0 }),
             });
+            setUserData({ ...userObj, streak: 0 });
           }
         }
 
@@ -109,7 +110,23 @@ export default function Home() {
 
     getChallenges();
   }, [userData?._id]);
+  const refreshUser = async () => {
+    if (!user || !isSignedIn) return;
 
+    const email = encodeURIComponent(user.emailAddresses[0].emailAddress);
+    const res = await fetch(`/api/user/email/${email}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!res.ok) {
+      setUserData(null);
+      return;
+    }
+
+    const userObj: IUsers = await res.json();
+    setUserData(userObj);
+  };
   if (!isLoaded || !isSignedIn) {
     return null;
   }
@@ -155,7 +172,7 @@ export default function Home() {
             </VStack>
           )}
 
-          <TaskList userId={userData ? String(userData._id) : undefined} />
+          <TaskList userId={userData ? String(userData._id) : undefined} onCompletionUpdated={refreshUser} />
         </VStack>
       </Box>
     </main>
