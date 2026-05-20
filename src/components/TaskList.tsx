@@ -32,10 +32,11 @@ type TaskResponse = {
 type TaskListProps = {
   userId?: string;
   showHeader?: boolean;
+  refreshKey?: number;
   onChange?: () => void | Promise<void>;
 };
 
-export default function TaskList({ userId, showHeader = true, onChange }: TaskListProps) {
+export default function TaskList({ userId, showHeader = true, refreshKey = 0, onChange }: TaskListProps) {
   const [task, setTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -101,7 +102,7 @@ export default function TaskList({ userId, showHeader = true, onChange }: TaskLi
     };
 
     fetchTask();
-  }, [userId]);
+  }, [userId, refreshKey]);
 
   const updateCompletion = async (completed: boolean) => {
     if (!task || !userId || task.completed === completed) return;

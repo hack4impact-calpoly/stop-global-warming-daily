@@ -4,7 +4,7 @@ import ChallengeComponent, { ChallengeSummary, ChallengeTask } from "@/component
 import { LuChevronLeft, LuChevronRight, LuBell } from "react-icons/lu";
 import Link from "next/link";
 import TaskList from "@/components/TaskList";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { IUsers } from "@/database/userSchema";
 import { useRouter } from "next/navigation";
@@ -21,6 +21,7 @@ export default function Home() {
   const [challenges, setChallenges] = useState<HydratedChallenge[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const router = useRouter();
+  const didAssignToday = useRef(false);
 
   // if user is not signed in redirect to login page
   useEffect(() => {
@@ -48,7 +49,22 @@ export default function Home() {
         const userObj: IUsers = await res.json();
         setUserData(userObj);
 
-        console.log("user is signed in!");
+        // assign daily task
+        if (!didAssignToday.current) {
+          didAssignToday.current = true;
+
+          const res = await fetch(`/api/taskAssignment/assignToday`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: userObj._id }),
+          });
+
+          if (res.ok) {
+            setRefreshKey((prev) => prev + 1);
+          }
+
+          console.log("user is signed in!");
+        }
       }
     };
 
@@ -134,7 +150,11 @@ export default function Home() {
             </VStack>
           )}
 
-          <TaskList userId={userData ? String(userData._id) : undefined} onChange={refreshUser} />
+          <TaskList
+            userId={userData ? String(userData._id) : undefined}
+            refreshKey={refreshKey}
+            onChange={refreshUser}
+          />
         </VStack>
       </Box>
     </main>
