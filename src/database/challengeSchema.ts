@@ -13,7 +13,6 @@ export enum Tag {
 export type IChallenges = {
   _id: Types.ObjectId;
   title: string;
-  color: string;
   task_ids: Types.ObjectId[];
   users: Types.ObjectId[];
   isActive: boolean;
@@ -25,12 +24,6 @@ export type IChallenges = {
 const challengeSchema = new Schema(
   {
     title: { type: String, required: true, trim: true },
-
-    color: {
-      type: String,
-      required: true,
-      default: "#3B82F6",
-    },
 
     task_ids: [
       {

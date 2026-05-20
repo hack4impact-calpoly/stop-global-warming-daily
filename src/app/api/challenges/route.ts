@@ -27,7 +27,6 @@ export async function POST(req: Request) {
     const newChallenge = await ChallengeModel.create({
       title: body.title.trim(),
       description: body.description.trim(),
-      color: body.color ?? "#3B82F6",
       tags: Array.isArray(body.tags) ? body.tags : [],
       time: Number(body.time ?? 0),
       task_ids: Array.isArray(body.task_ids) ? body.task_ids : [],

@@ -12,8 +12,8 @@ const AVAILABLE_TAGS = [
   { label: "Waste Reduction", color: "orange.400" },
   { label: "Energy Saving", color: "teal.400" },
   { label: "Transportation", color: "purple.400" },
-  { label: "Water Conservation", color: "cyan.400" },
-  { label: "Community", color: "green.400" },
+  { label: "Nature Preservation & Restoration", color: "cyan.400" },
+  { label: "Community/Volunteering", color: "green.400" },
 ];
 
 type Task = {
@@ -120,7 +120,6 @@ export default function NewChallengePage() {
           time,
           task_ids: selectedTaskIds,
           isActive,
-          color: "#3B82F6",
         }),
       });
 
