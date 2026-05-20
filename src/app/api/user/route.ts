@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/database/db";
 import User from "@/database/userSchema";
+import { upsertChallengeTaskAssignments } from "@/lib/challengeTaskAssignments";
+import ChallengeModel from "@/database/challengeSchema";
+import { addNewUserToActiveChallenges } from "@/lib/newUserChallenges";
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,6 +29,8 @@ export async function POST(req: NextRequest) {
       focuses: focuses ?? [],
       picture: picture ?? "",
     });
+
+    await addNewUserToActiveChallenges(newUser._id.toString());
 
     return NextResponse.json(newUser, { status: 201 });
   } catch (error) {

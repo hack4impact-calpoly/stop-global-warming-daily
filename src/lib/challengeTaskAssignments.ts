@@ -12,7 +12,7 @@ const toObjectIdString = (value: unknown) => {
     return value;
   }
 
-  if (value instanceof Types.ObjectId) {
+  if (value && typeof value === "object" && "toString" in value && Types.ObjectId.isValid(value.toString())) {
     return value.toString();
   }
 
@@ -59,7 +59,9 @@ export const upsertChallengeTaskAssignments = async ({
   userIds,
   taskIds,
 }: ChallengeAssignmentSyncInput) => {
+  console.log("upsert input:", { challengeId, userIds, taskIds });
   if (!userIds.length || !taskIds.length) {
+    console.log("Skipping assignment creation because userIds or taskIds is empty");
     return { assignmentPairs: 0 };
   }
 
