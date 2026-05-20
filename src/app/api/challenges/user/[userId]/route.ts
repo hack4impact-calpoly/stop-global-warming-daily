@@ -26,9 +26,13 @@ export async function GET(_req: Request, { params }: { params: { userId: string 
     }
 
     const challengeIds = challenges.map((challenge: any) => String(challenge._id));
+
     const allTaskIds = challenges.flatMap((challenge: any) => (challenge.task_ids || []).map((id: any) => String(id)));
 
     const uniqueTaskIds = [...new Set(allTaskIds)].filter((id) => Types.ObjectId.isValid(id));
+
+    const challengeObjectIds = challengeIds.map((id) => new Types.ObjectId(id));
+    const taskObjectIds = uniqueTaskIds.map((id) => new Types.ObjectId(id));
 
     const tasks = await TaskModel.find({
       _id: { $in: uniqueTaskIds },
@@ -38,8 +42,8 @@ export async function GET(_req: Request, { params }: { params: { userId: string 
 
     const assignments = await TaskAssignment.find({
       user_id: userObjectId,
-      challenge_id: { $in: challengeIds },
-      task_id: { $in: uniqueTaskIds },
+      challenge_id: { $in: challengeObjectIds },
+      task_id: { $in: taskObjectIds },
     }).lean();
 
     const assignmentByChallengeTaskKey = new Map<string, any>(
