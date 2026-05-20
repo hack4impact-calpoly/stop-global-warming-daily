@@ -133,16 +133,33 @@ export default function ManageResourcesPage() {
 
   return (
     <Box display="flex" justifyContent="center" minH="100vh">
-      <Box maxW="400px" w="full" minH="100vh" p={5} pb="160px" position="relative">
+      <Box maxW="400px" w="full" minH="100vh" p={5} pb="160px">
         <VStack align="stretch" gap={4}>
-          <HStack gap={3}>
-            <Link href="/admin" style={{ display: "flex", alignItems: "center" }}>
-              <LuChevronLeft size={28} />
-            </Link>
+          <HStack gap={3} justify="space-between">
+            <HStack gap={3}>
+              <Link href="/admin" style={{ display: "flex", alignItems: "center" }}>
+                <LuChevronLeft size={28} />
+              </Link>
+              <Text fontWeight="semibold" fontSize="4xl">
+                Resources
+              </Text>
+            </HStack>
 
-            <Text fontWeight="semibold" fontSize="4xl">
-              Resources
-            </Text>
+            <Link href="/admin/manage-resources/new-resource">
+              <IconButton
+                aria-label="Add resource"
+                w="44px"
+                h="44px"
+                borderRadius="full"
+                variant="outline"
+                borderColor="blue.300"
+                color="blue.300"
+                bg="white"
+                shadow="sm"
+              >
+                <LuPlus size={22} />
+              </IconButton>
+            </Link>
           </HStack>
 
           <Box position="relative">
@@ -155,7 +172,6 @@ export default function ManageResourcesPage() {
               borderRadius="full"
               pr="45px"
             />
-
             <Box
               position="absolute"
               right="14px"
@@ -172,26 +188,6 @@ export default function ManageResourcesPage() {
             {renderResourceContent()}
           </VStack>
         </VStack>
-
-        <Link href="/admin/manage-resources/new-resource">
-          <IconButton
-            aria-label="Add resource"
-            position="fixed"
-            right="24px"
-            bottom="96px"
-            w="64px"
-            h="64px"
-            borderRadius="full"
-            variant="outline"
-            borderColor="blue.300"
-            color="blue.300"
-            bg="white"
-            shadow="md"
-            zIndex={30}
-          >
-            <LuPlus size={28} />
-          </IconButton>
-        </Link>
       </Box>
     </Box>
   );
