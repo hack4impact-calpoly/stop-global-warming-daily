@@ -53,3 +53,20 @@ export async function DELETE(req: Request, { params }: { params: { challengeId: 
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
+
+export async function GET(req: Request, { params }: { params: { challengeId: string } }) {
+  try {
+    await connectDB();
+
+    const challenge = await ChallengeModel.findById(params.challengeId);
+
+    if (!challenge) {
+      return NextResponse.json({ error: "Challenge not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(challenge, { status: 200 });
+  } catch (error) {
+    console.error("GET /api/challenges/[challengeId] error:", error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}

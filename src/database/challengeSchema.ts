@@ -1,5 +1,15 @@
 import mongoose, { Schema, Types } from "mongoose";
 
+export enum Tag {
+  SustainableFood = "Sustainable Food",
+  Transportation = "Transportation",
+  Shopping = "Shopping",
+  Community = "Community/Volunteering",
+  WasteReduction = "Waste Reduction",
+  EnergySaving = "Energy Saving",
+  Nature = "Nature Preservation & Restoration",
+}
+
 export type IChallenges = {
   _id: Types.ObjectId;
   title: string;
@@ -7,6 +17,9 @@ export type IChallenges = {
   task_ids: Types.ObjectId[];
   users: Types.ObjectId[];
   isActive: boolean;
+  description: string;
+  tags: string[];
+  time: number;
 };
 
 const challengeSchema = new Schema(
@@ -38,6 +51,23 @@ const challengeSchema = new Schema(
     isActive: {
       type: Boolean,
       default: false,
+    },
+
+    description: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    time: {
+      type: Number,
+      defualt: 30,
+    },
+
+    tags: {
+      type: [String],
+      enum: Object.values(Tag),
+      default: [],
     },
   },
   {

@@ -22,9 +22,18 @@ export async function POST(req: Request) {
   try {
     await connectDB();
 
-    const challenge = await req.json();
+    const body = await req.json();
 
-    const newChallenge = await ChallengeModel.create(challenge);
+    const newChallenge = await ChallengeModel.create({
+      title: body.title.trim(),
+      description: body.description.trim(),
+      color: body.color ?? "#3B82F6",
+      tags: Array.isArray(body.tags) ? body.tags : [],
+      time: Number(body.time ?? 0),
+      task_ids: Array.isArray(body.task_ids) ? body.task_ids : [],
+      users: Array.isArray(body.users) ? body.users : [],
+      isActive: Boolean(body.isActive),
+    });
 
     await syncChallengeTaskAssignments({
       challengeId: newChallenge._id.toString(),
