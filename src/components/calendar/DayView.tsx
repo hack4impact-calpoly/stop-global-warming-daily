@@ -42,9 +42,13 @@ const getTaskIdFromAssignment = (assignment: TaskAssignmentResponse) => {
 };
 
 const getNextGoal = (streak: number) => {
-  if (streak < 7) return 7;
-  if (streak < 14) return 14;
+  if (streak < 3) return 3;
+  if (streak < 5) return 7;
+  if (streak < 10) return 10;
+  if (streak < 20) return 20;
   if (streak < 30) return 30;
+  if (streak < 40) return 40;
+  if (streak < 50) return 50;
   return Math.ceil((streak + 1) / 7) * 7;
 };
 
