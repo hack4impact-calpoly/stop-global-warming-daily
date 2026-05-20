@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/database/db";
 import TaskAssignment from "@/database/taskAssignmentSchema";
