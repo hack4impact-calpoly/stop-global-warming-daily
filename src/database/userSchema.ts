@@ -28,6 +28,10 @@ export interface IUsers {
   interests: string[];
   focuses: string[];
   picture: string;
+  notificationsAsked: boolean;
+  notificationsEnabled: boolean;
+  installationAsked: boolean;
+  installed: boolean;
 }
 
 const UserSchema = new Schema(
@@ -87,6 +91,30 @@ const UserSchema = new Schema(
       type: String,
       trim: true,
       default: "",
+    },
+
+    notificationsAsked: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+
+    notificationsEnabled: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+
+    installationAsked: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+
+    installed: {
+      type: Boolean,
+      required: true,
+      default: false,
     },
   },
   { timestamps: true },

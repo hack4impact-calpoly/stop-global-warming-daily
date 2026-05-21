@@ -14,6 +14,8 @@ type HydratedChallenge = ChallengeSummary & {
   tasks: ChallengeTask[];
   completionPercentage: number;
 };
+import PushNotificationManager from "@/components/PushNotificationManager";
+import InstallPrompt from "@/components/InstallPrompt";
 
 export default function Home() {
   const { isSignedIn, user, isLoaded } = useUser();
@@ -120,6 +122,12 @@ export default function Home() {
               <LuBell size={24} />
             </Link>
           </HStack>
+          <div>
+            {userData && !userData.notificationsAsked && (
+              <PushNotificationManager userData={userData} setUserData={setUserData} />
+            )}
+            {userData && !userData.installationAsked && <InstallPrompt userData={userData} setUserData={setUserData} />}
+          </div>
 
           <VStack w={"full"} gap={5} py={"20px"}>
             <HStack w={"full"} justifyContent={"space-between"}>
