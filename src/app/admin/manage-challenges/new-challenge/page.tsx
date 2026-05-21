@@ -108,6 +108,21 @@ function NewChallengeForm() {
     setError("");
 
     try {
+      const userResponse = await fetch("/api/user", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const allUsers = await userResponse.json().catch(() => null);
+
+      if (!userResponse.ok) {
+        throw new Error(allUsers?.error ?? `Failed to fetch users.`);
+      }
+
+      console.log(allUsers);
+
       const response = await fetch(isEditMode && challengeId ? `/api/challenges/${challengeId}` : "/api/challenges", {
         method: isEditMode ? "PATCH" : "POST",
         headers: {
@@ -118,6 +133,7 @@ function NewChallengeForm() {
           description: description.trim(),
           tags: selectedTags,
           time,
+          users: isActive ? allUsers : [],
           task_ids: selectedTaskIds,
           isActive,
         }),
