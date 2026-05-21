@@ -38,3 +38,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: String(error) }, { status: 500 });
   }
 }
+
+// GET all users
+export async function GET(req: NextRequest) {
+  try {
+    await connectDB();
+
+    const allUsers = await User.find({}).select("_id");
+    const idList = allUsers.map((obj) => obj._id);
+    return NextResponse.json(idList, { status: 200 });
+  } catch (error) {
+    console.error("GET /api/user error:", error);
+    return NextResponse.json({ error: String(error) }, { status: 500 });
+  }
+}
