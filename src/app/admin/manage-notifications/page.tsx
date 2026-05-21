@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Box, Text, VStack, HStack, Input, Textarea, Button } from "@chakra-ui/react";
 import { LuChevronLeft, LuCheck } from "react-icons/lu";
+import { sendNotification } from "@/app/actions";
 
 type NotifFormResponse = {
   _id?: string;
@@ -22,7 +23,7 @@ function NewNotification() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSave = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSend = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!header.trim()) {
@@ -39,28 +40,7 @@ function NewNotification() {
     setError("");
 
     try {
-      // TODO: backend implementation for Notification Page
-      /*
-      const response = await fetch(isEditMode && resourceId ? `/api/resource/${resourceId}` : "/api/resource", {
-        method: isEditMode ? "PATCH" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: title.trim(),
-          description: description.trim(),
-          location: location.trim(),
-          link: link.trim(),
-          tags: selectedTags,
-        }),
-      });
-
-      const data: ResourceFormResponse | null = await response.json().catch(() => null);
-
-      if (!response.ok) {
-        throw new Error(data?.error ?? `Failed to ${isEditMode ? "update" : "create"} resource.`);
-      }
-        */
+      const response = sendNotification(header, description);
 
       router.push("/admin");
       router.refresh();
@@ -75,7 +55,7 @@ function NewNotification() {
   return (
     <Box display="flex" justifyContent="center" minH="100vh" bg="gray.50">
       <Box maxW="400px" w="full" minH="100vh" p={5} pb="120px">
-        <form onSubmit={handleSave}>
+        <form onSubmit={handleSend}>
           <VStack align="stretch" gap={6}>
             <HStack gap={3}>
               <Link href="/admin/manage-resources" style={{ display: "flex", alignItems: "center" }}>
@@ -143,7 +123,7 @@ function NewNotification() {
               h="52px"
               disabled={isSaving}
             >
-              {isSaving ? "Saving..." : "Save Resource"}
+              {isSaving ? "Sending..." : "Send"}
             </Button>
           </VStack>
         </form>

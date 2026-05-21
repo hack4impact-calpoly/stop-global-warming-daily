@@ -47,13 +47,13 @@ export async function unsubscribeUser(endpoint: string) {
   return { success: true };
 }
 
-export async function sendNotification(message: string) {
+export async function sendNotification(header: string, message: string) {
   await connectDB();
 
   const subscriptions = await Subscription.find({});
 
   const payload = JSON.stringify({
-    title: "Test Notification",
+    title: header,
     body: message,
     icon: "/icon.png",
   });
