@@ -128,14 +128,6 @@ export default function PushNotificationManager({ userData, setUserData }: PushN
     await unsubscribeUser(endpoint);
   }
 
-  async function sendTestNotification() {
-    console.log(subscription);
-    if (subscription) {
-      await sendNotification(message);
-      setMessage("");
-    }
-  }
-
   if (!isSupported) {
     return <p>Push notifications are not supported in this browser.</p>;
   }
