@@ -16,6 +16,7 @@ type HydratedChallenge = ChallengeSummary & {
 };
 import PushNotificationManager from "@/components/PushNotificationManager";
 import InstallPrompt from "@/components/InstallPrompt";
+import DayView from "@/components/calendar/DayView";
 
 export default function Home() {
   const { isSignedIn, user, isLoaded } = useUser();
@@ -130,19 +131,14 @@ export default function Home() {
           </div>
 
           <VStack w={"full"} gap={5} py={"20px"}>
-            <HStack w={"full"} justifyContent={"space-between"}>
-              <IconButton aria-label="Previous Progress Ring" variant={"ghost"} size={"2xl"}>
-                <LuChevronLeft />
-              </IconButton>
-              <Text fontSize={"42px"} fontWeight={"600"}>
-                Today
-              </Text>
-              <IconButton aria-label="Next Progress Ring" variant={"ghost"} size={"2xl"}>
-                <LuChevronRight />
-              </IconButton>
-            </HStack>
             <StreakCard streak={userData?.streak} completedDates={userData?.completedDates} />
           </VStack>
+
+          <Text fontSize="md" fontWeight="semibold" color="gray.600" pb={3}>
+            Daily Task
+          </Text>
+
+          <DayView userData={userData} selectedDate={new Date()} progressBar={false} setUserData={setUserData} />
 
           {challenges.length > 0 && (
             <VStack w="full" align="stretch" gap={3}>
@@ -157,12 +153,6 @@ export default function Home() {
               ))}
             </VStack>
           )}
-
-          <TaskList
-            userId={userData ? String(userData._id) : undefined}
-            refreshKey={refreshKey}
-            onChange={refreshUser}
-          />
         </VStack>
       </Box>
     </main>
