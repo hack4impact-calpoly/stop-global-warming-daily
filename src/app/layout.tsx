@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Provider } from "@/components/ui/provider";
 import { ClerkProvider } from "@clerk/nextjs";
 import AppShell from "@/components/AppShell";
-import "./globals.css";
 
 //! Update metadata to match your project
 export const metadata: Metadata = {

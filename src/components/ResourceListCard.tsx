@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent } from "react";
-import { Box, HStack, Tag, Text, VStack } from "@chakra-ui/react";
-import { LuCheck, LuChevronRight, LuX } from "react-icons/lu";
+import { Box, HStack, Tag, Text, VStack, Button, Link } from "@chakra-ui/react";
+import { LuCheck, LuChevronRight, LuX, LuExternalLink } from "react-icons/lu";
 
 type ResourceCardVariant = "discover" | "saved";
 
@@ -12,6 +12,7 @@ interface ResourceListCardProps {
   description: string;
   interestTags: string[];
   variant: ResourceCardVariant;
+  link?: string;
   onSave?: () => void;
   onDelete?: () => void;
 }
@@ -32,6 +33,7 @@ const DEFAULT_TAG_STYLE = { bg: "#DDE5EC", color: "#2D3748" };
 export default function ResourceListCard({
   title,
   description,
+  link,
   interestTags,
   variant,
   onSave,
@@ -186,8 +188,8 @@ export default function ResourceListCard({
         onTouchMove={handleMove}
         onTouchEnd={handleEnd}
       >
-        <HStack align="flex-start" justify="space-between" gap={3}>
-          <VStack align="flex-start" gap={1} flex={1}>
+        <HStack align="flex-start" justify="space-between" gap={3} marginTop={3}>
+          <VStack align="flex-start" gap={3} flex={1}>
             <Text fontSize="xl" fontWeight="bold" lineHeight="1.1" color="black">
               {title}
             </Text>
@@ -223,6 +225,13 @@ export default function ResourceListCard({
             >
               {description}
             </Text>
+            {isExpanded && (
+              <Link href={link} target="_blank" rel="noopener noreferrer">
+                <Button background="#64B9FF" h={8} size={"lg"} marginTop={1} marginBottom={3} color="white">
+                  Visit Website <LuExternalLink />{" "}
+                </Button>
+              </Link>
+            )}
           </VStack>
 
           <Box
