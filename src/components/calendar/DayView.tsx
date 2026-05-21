@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { Box, HStack, Text, VStack } from "@chakra-ui/react";
 import TaskCardExpanded from "@/components/TaskCardExpanded";
 import { IUsers } from "@/database/userSchema";
@@ -8,6 +8,8 @@ import { IUsers } from "@/database/userSchema";
 type DailyViewProps = {
   userData: IUsers | null;
   selectedDate: Date;
+  progressBar: boolean;
+  setUserData?: Dispatch<SetStateAction<IUsers | null>>;
 };
 
 type TaskAssignmentResponse = {
@@ -52,7 +54,7 @@ const getNextGoal = (streak: number) => {
   return Math.ceil((streak + 1) / 7) * 7;
 };
 
-export default function DayView({ userData, selectedDate }: DailyViewProps) {
+export default function DayView({ userData, selectedDate, progressBar, setUserData }: DailyViewProps) {
   const [task, setTask] = useState<DailyTask | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -138,6 +140,16 @@ export default function DayView({ userData, selectedDate }: DailyViewProps) {
       if (!res.ok) {
         throw new Error("Failed to update task completion");
       }
+
+      if (setUserData) {
+        setUserData((userData) => {
+          if (!userData) return userData;
+          return {
+            ...userData,
+            streak: userData.streak + 1,
+          };
+        });
+      }
     } catch (error) {
       console.error("Failed to mark task complete:", error);
       setTask(previousTask);
@@ -152,18 +164,21 @@ export default function DayView({ userData, selectedDate }: DailyViewProps) {
 
   return (
     <VStack w="full" align="stretch" gap={3}>
-      <Box w="full" h="12px" bg="#DCE4EC" borderRadius="full" overflow="hidden">
-        <Box h="100%" w={`${progressPercent}%`} bg="#64B9FF" borderRadius="full" />
-      </Box>
-
-      <HStack justify="space-between">
-        <Text fontSize="xs" color="gray.600" fontWeight="medium">
-          Current streak: {streak} days
-        </Text>
-        <Text fontSize="xs" color="gray.600" fontWeight="medium">
-          Next goal: {nextGoal} days
-        </Text>
-      </HStack>
+      {progressBar && (
+        <>
+          <Box w="full" h="12px" bg="#DCE4EC" borderRadius="full" overflow="hidden">
+            <Box h="100%" w={`${progressPercent}%`} bg="#64B9FF" borderRadius="full" />
+          </Box>
+          <HStack justify="space-between">
+            <Text fontSize="xs" color="gray.600" fontWeight="medium">
+              Current streak: {streak} days
+            </Text>
+            <Text fontSize="xs" color="gray.600" fontWeight="medium">
+              Next goal: {nextGoal} days
+            </Text>
+          </HStack>
+        </>
+      )}
 
       {task ? (
         <TaskCardExpanded

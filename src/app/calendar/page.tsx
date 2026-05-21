@@ -136,7 +136,7 @@ export default function Page() {
             onPrevious={() => setSelectedDate((prev) => addDays(prev, -1))}
             onNext={() => setSelectedDate((prev) => addDays(prev, 1))}
           />
-          <DayView userData={userData} selectedDate={selectedDate} />
+          <DayView userData={userData} selectedDate={selectedDate} progressBar={true} />
         </>
       );
     else if (selectCalendar === "W")
