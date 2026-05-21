@@ -1,17 +1,36 @@
 "use client";
 import { useNewUserFormContext } from "@/lib/hooks/sign-up";
-import { VStack, Text, Button } from "@chakra-ui/react";
+import { VStack, Text, Button, Box } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useState } from "react";
 
 export default function Page() {
   const router = useRouter();
   const { step: currentStep, updateStep } = useNewUserFormContext();
+  const [showIntro, setShowIntro] = useState(false);
 
   const onNext = async () => {
     updateStep(currentStep + 1);
     router.push("/sign-up/account");
   };
+
+  // Splash Screen
+  if (!showIntro) {
+    return (
+      <Box w="100%" h="100dvh" cursor="pointer" onClick={() => setShowIntro(true)}>
+        <Image
+          src="/images/sgwd_onboard.png"
+          alt="Welcome"
+          fill
+          priority
+          style={{
+            objectFit: "cover",
+          }}
+        />
+      </Box>
+    );
+  }
 
   return (
     <VStack w={"100%"} gap={10} px={10}>
