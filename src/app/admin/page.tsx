@@ -44,6 +44,15 @@ export default function AdminPage() {
               <LuChevronRight />
             </HStack>
           </Link>
+
+          <Link href="/admin/manage-notifications" style={{ textDecoration: "none", color: "inherit" }}>
+            <HStack w="full" justifyContent="space-between" cursor="pointer" p={2}>
+              <Text fontWeight="normal" fontSize="md">
+                Send notification
+              </Text>
+              <LuChevronRight />
+            </HStack>
+          </Link>
         </VStack>
       </VStack>
     </Box>
