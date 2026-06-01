@@ -43,10 +43,19 @@ export default function AdminResourceCard({
   };
 
   return (
-    <Box bg="white" borderRadius="xl" p={4} shadow="sm">
-      <HStack align="flex-start" justify="space-between" gap={3}>
-        <VStack align="stretch" gap={2} flex={1}>
-          <Text fontWeight="bold" fontSize="lg">
+    <Box bg="white" borderRadius="xl" p={4} shadow="sm" w="100%">
+      <HStack align="flex-start" justify="space-between" gap={3} w="100%">
+        <VStack align="stretch" gap={2} flex={1} minW={0}>
+          <Text
+            fontWeight="bold"
+            fontSize="lg"
+            w="100%"
+            textAlign="left"
+            whiteSpace="normal"
+            overflowWrap="anywhere"
+            wordBreak="break-word"
+            lineHeight="1.25"
+          >
             {title}
           </Text>
 

@@ -21,9 +21,18 @@ export default function AdminChallengeCard({ title, description, isActive }: Adm
       >
         {/* Header */}
         <HStack h="100%" w="100%" align="flex-start" gap={2}>
-          <Collapsible.Trigger transition="transform 0.2s" flex="1" w="100%">
-            <VStack align="flex-start" gap={0} w="100%">
-              <Text fontSize="lg" fontWeight="semibold">
+          <Collapsible.Trigger transition="transform 0.2s" flex="1" minW={0} w="100%" textAlign="left">
+            <VStack align="flex-start" gap={0} minW={0} w="100%">
+              <Text
+                fontSize="lg"
+                fontWeight="semibold"
+                w="100%"
+                textAlign="left"
+                whiteSpace="normal"
+                overflowWrap="anywhere"
+                wordBreak="break-word"
+                lineHeight="1.25"
+              >
                 {title}
               </Text>
               <Text fontSize="sm" color={isActive ? "#ADEA9E" : "#EA9E9E"}>
