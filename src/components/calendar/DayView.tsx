@@ -54,6 +54,11 @@ const getNextGoal = (streak: number) => {
   return Math.ceil((streak + 1) / 7) * 7;
 };
 
+const isSameCalendarDay = (firstDate: Date, secondDate: Date) =>
+  firstDate.getFullYear() === secondDate.getFullYear() &&
+  firstDate.getMonth() === secondDate.getMonth() &&
+  firstDate.getDate() === secondDate.getDate();
+
 export default function DayView({ userData, selectedDate, progressBar, setUserData }: DailyViewProps) {
   const [task, setTask] = useState<DailyTask | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -142,11 +147,21 @@ export default function DayView({ userData, selectedDate, progressBar, setUserDa
       }
 
       if (setUserData) {
-        setUserData((userData) => {
-          if (!userData) return userData;
+        setUserData((currentUserData) => {
+          if (!currentUserData) return currentUserData;
+
+          const completedDate = selectedDate ?? new Date();
+          const completedDates = currentUserData.completedDates ?? [];
+
+          const alreadyCompletedDate = completedDates.some((date) => {
+            const existingDate = new Date(date);
+            return isSameCalendarDay(existingDate, completedDate);
+          });
+
           return {
-            ...userData,
-            streak: userData.streak + 1,
+            ...currentUserData,
+            streak: currentUserData.streak + (alreadyCompletedDate ? 0 : 1),
+            completedDates: alreadyCompletedDate ? completedDates : [...completedDates, completedDate],
           };
         });
       }
