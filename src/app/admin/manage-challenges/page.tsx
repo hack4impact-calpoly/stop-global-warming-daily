@@ -91,6 +91,12 @@ export default function ManageChallengePage() {
     challenge.title.toLowerCase().includes(searchTerm.trim().toLowerCase()),
   );
 
+  const handleDelete = async (id: string) => {
+    const res = await fetch(`/api/challenges/${id}`, { method: "DELETE" });
+    if (!res.ok) throw new Error("Failed to delete");
+    setChallenges((prev) => prev.filter((c) => c.id !== id));
+  };
+
   const renderChallengeContent = () => {
     if (isLoading) {
       return (
@@ -127,9 +133,11 @@ export default function ManageChallengePage() {
     return filteredChallenges.map((challenge) => (
       <AdminChallengeCard
         key={challenge.id}
+        id={challenge.id}
         title={challenge.title}
         description={challenge.description}
         isActive={challenge.isActive}
+        onDelete={handleDelete}
       />
     ));
   };

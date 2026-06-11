@@ -43,9 +43,90 @@ function NewChallengeForm() {
   const [tasksError, setTasksError] = useState("");
   const [taskSearch, setTaskSearch] = useState("");
   const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
+  const [pendingTaskIds, setPendingTaskIds] = useState<string[] | null>(null); // holds ids until tasks load
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const challengeId = searchParams.get("challengeId");
+  const isEditMode = Boolean(challengeId);
 
   const visibleTags = showAllTags ? AVAILABLE_TAGS : AVAILABLE_TAGS.slice(0, 5);
   const hiddenCount = AVAILABLE_TAGS.length - 5;
+
+  // Fetch all available tasks first
+  useEffect(() => {
+    const fetchTasks = async () => {
+      setTasksLoading(true);
+      setTasksError("");
+      try {
+        const res = await fetch("/api/task", { cache: "no-store" });
+        if (!res.ok) throw new Error("Failed to load tasks");
+        const data: TaskResponse[] = await res.json();
+        const loaded = data.map((t) => ({ id: t._id, title: t.title }));
+        setTasks(loaded);
+
+        if (pendingTaskIds !== null) {
+          setSelectedTaskIds(pendingTaskIds);
+          setPendingTaskIds(null);
+        }
+      } catch (err) {
+        console.error("Failed to load tasks:", err);
+        setTasksError("Unable to load tasks right now.");
+      } finally {
+        setTasksLoading(false);
+      }
+    };
+
+    fetchTasks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (pendingTaskIds !== null && !tasksLoading) {
+      setSelectedTaskIds(pendingTaskIds);
+      setPendingTaskIds(null);
+    }
+  }, [tasksLoading, pendingTaskIds]);
+
+  useEffect(() => {
+    if (!challengeId) return;
+
+    const fetchChallenge = async () => {
+      try {
+        const res = await fetch(`/api/challenges/${challengeId}`, { cache: "no-store" });
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data?.error ?? "Failed to load challenge.");
+
+        const totalMinutes = typeof data.time === "number" ? data.time : 0;
+
+        setTitle(data.title ?? "");
+        setDescription(data.description ?? "");
+        setSelectedTags(Array.isArray(data.tags) ? data.tags : []);
+        setIsActive(Boolean(data.isActive));
+        setHours(String(Math.floor(totalMinutes / 60)));
+        setMinutes(String(totalMinutes % 60));
+        setShowAllTags(true);
+
+        const ids: string[] = Array.isArray(data.task_ids)
+          ? data.task_ids.map((t: TaskResponse | string) => (typeof t === "string" ? t : t._id))
+          : [];
+
+        // If tasks already loaded apply immediately, otherwise queue them
+        if (!tasksLoading) {
+          setSelectedTaskIds(ids);
+        } else {
+          setPendingTaskIds(ids);
+        }
+      } catch (err) {
+        console.error("Failed to load challenge:", err);
+        setError(err instanceof Error ? err.message : "Unable to load challenge.");
+      }
+    };
+
+    fetchChallenge();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [challengeId]);
 
   const toggleTag = (label: string) => {
     setSelectedTags((prev) => (prev.includes(label) ? prev.filter((t) => t !== label) : [...prev, label]));
@@ -59,35 +140,8 @@ function NewChallengeForm() {
     setSelectedTaskIds((prev) => prev.filter((t) => t !== id));
   };
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      setTasksLoading(true);
-      setTasksError("");
-      try {
-        const res = await fetch("/api/task", { cache: "no-store" });
-        if (!res.ok) throw new Error("Failed to load tasks");
-        const data: TaskResponse[] = await res.json();
-        setTasks(data.map((t) => ({ id: t._id, title: t.title })));
-      } catch (err) {
-        console.error("Failed to load tasks:", err);
-        setTasksError("Unable to load tasks right now.");
-      } finally {
-        setTasksLoading(false);
-      }
-    };
-
-    fetchTasks();
-  }, []);
-
   const filteredTasks = tasks.filter((t) => t.title.toLowerCase().includes(taskSearch.trim().toLowerCase()));
-
   const selectedTasks = tasks.filter((t) => selectedTaskIds.includes(t.id));
-
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const challengeId = searchParams.get("challengeId");
-  const isEditMode = Boolean(challengeId);
 
   const handleSave = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -110,24 +164,15 @@ function NewChallengeForm() {
     try {
       const userResponse = await fetch("/api/user", {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
 
       const allUsers = await userResponse.json().catch(() => null);
-
-      if (!userResponse.ok) {
-        throw new Error(allUsers?.error ?? `Failed to fetch users.`);
-      }
-
-      console.log(allUsers);
+      if (!userResponse.ok) throw new Error(allUsers?.error ?? "Failed to fetch users.");
 
       const response = await fetch(isEditMode && challengeId ? `/api/challenges/${challengeId}` : "/api/challenges", {
         method: isEditMode ? "PATCH" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: title.trim(),
           description: description.trim(),
@@ -140,10 +185,7 @@ function NewChallengeForm() {
       });
 
       const data = await response.json().catch(() => null);
-
-      if (!response.ok) {
-        throw new Error(data?.error ?? `Failed to ${isEditMode ? "update" : "create"} challenge.`);
-      }
+      if (!response.ok) throw new Error(data?.error ?? `Failed to ${isEditMode ? "update" : "create"} challenge.`);
 
       router.push("/admin/manage-challenges");
       router.refresh();
@@ -168,7 +210,7 @@ function NewChallengeForm() {
                 <LuChevronLeft size={28} />
               </Link>
               <Text fontWeight="semibold" fontSize="4xl">
-                New Challenge
+                {isEditMode ? "Edit Challenge" : "New Challenge"}
               </Text>
             </HStack>
 
@@ -218,6 +260,7 @@ function NewChallengeForm() {
                       return (
                         <Button
                           key={tag.label}
+                          type="button"
                           size="sm"
                           borderRadius="full"
                           variant="outline"
@@ -233,6 +276,7 @@ function NewChallengeForm() {
                     })}
                     {!showAllTags && hiddenCount > 0 && (
                       <Button
+                        type="button"
                         size="sm"
                         borderRadius="full"
                         variant="outline"
