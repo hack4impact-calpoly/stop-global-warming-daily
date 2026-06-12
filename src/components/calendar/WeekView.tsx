@@ -1,19 +1,17 @@
 "use client";
-import { useState } from "react";
-import { Box, VStack } from "@chakra-ui/react";
-import CalendarSubHeader from "@/components/CalendarSubHeader";
-import TaskList from "../TaskList";
+import { VStack } from "@chakra-ui/react";
 import { IUsers } from "@/database/userSchema";
 import WeeklyTaskList from "../WeeklyTaskList";
 
 type WeekViewProps = {
   userData: IUsers | null;
+  selectedDate: Date;
 };
 
-export default function WeekView({ userData }: WeekViewProps) {
+export default function WeekView({ userData, selectedDate }: WeekViewProps) {
   return (
     <VStack>
-      <WeeklyTaskList referenceDate={new Date()} userId={userData ? String(userData._id) : undefined} />
+      <WeeklyTaskList referenceDate={selectedDate} userId={userData ? String(userData._id) : undefined} />
     </VStack>
   );
 }

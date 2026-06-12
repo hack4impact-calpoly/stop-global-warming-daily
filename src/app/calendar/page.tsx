@@ -147,7 +147,7 @@ export default function Page() {
             onPrevious={() => setSelectedDate((prev) => addDays(prev, -7))}
             onNext={() => setSelectedDate((prev) => addDays(prev, 7))}
           ></CalendarSubHeader>
-          <WeekView userData={userData} />
+          <WeekView userData={userData} selectedDate={selectedDate} />
         </>
       );
     else
