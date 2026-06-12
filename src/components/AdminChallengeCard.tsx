@@ -1,13 +1,34 @@
+"use client";
 import { Collapsible, HStack, IconButton, Menu, Portal, Text, VStack } from "@chakra-ui/react";
+import { useRouter } from "next/navigation";
 import { LuEllipsisVertical } from "react-icons/lu";
 
 interface AdminChallengeCardProps {
+  id: string;
   title: string;
   description: string;
   isActive: boolean;
+  onDelete: (id: string) => Promise<void>;
 }
 
-export default function AdminChallengeCard({ title, description, isActive }: AdminChallengeCardProps) {
+export default function AdminChallengeCard({ id, title, description, isActive, onDelete }: AdminChallengeCardProps) {
+  const router = useRouter();
+
+  const handleEdit = () => {
+    router.push(`/admin/manage-challenges/new-challenge?challengeId=${id}`);
+  };
+
+  const handleDelete = async () => {
+    const confirmed = window.confirm(`Are you sure you want to delete "${title}"?`);
+    if (!confirmed) return;
+    try {
+      await onDelete(id);
+    } catch (error) {
+      console.error("Failed to delete challenge:", error);
+      alert("Failed to delete challenge. Please try again.");
+    }
+  };
+
   return (
     <Collapsible.Root>
       <VStack
@@ -19,7 +40,6 @@ export default function AdminChallengeCard({ title, description, isActive }: Adm
         align="stretch"
         boxShadow={"0px 1px 8px rgba(89, 91, 98, 0.1)"}
       >
-        {/* Header */}
         <HStack h="100%" w="100%" align="flex-start" gap={2}>
           <Collapsible.Trigger transition="transform 0.2s" flex="1" minW={0} w="100%" textAlign="left">
             <VStack align="flex-start" gap={0} minW={0} w="100%">
@@ -49,6 +69,7 @@ export default function AdminChallengeCard({ title, description, isActive }: Adm
               </Text>
             </VStack>
           </Collapsible.Trigger>
+
           <Menu.Root>
             <Menu.Trigger asChild>
               <IconButton
@@ -66,14 +87,18 @@ export default function AdminChallengeCard({ title, description, isActive }: Adm
             <Portal>
               <Menu.Positioner>
                 <Menu.Content>
-                  <Menu.Item value="edit-challenge">Edit</Menu.Item>
-                  <Menu.Item value="delete-challenge">Delete</Menu.Item>
+                  <Menu.Item value="edit-challenge" onClick={handleEdit}>
+                    Edit
+                  </Menu.Item>
+                  <Menu.Item value="delete-challenge" onClick={handleDelete}>
+                    Delete
+                  </Menu.Item>
                 </Menu.Content>
               </Menu.Positioner>
             </Portal>
           </Menu.Root>
         </HStack>
-        {/* Full Description */}
+
         <Collapsible.Content>
           <Text color="gray.600" fontSize="sm" pt={3}>
             {description}
