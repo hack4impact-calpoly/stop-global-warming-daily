@@ -22,9 +22,7 @@ export default function Page() {
   const [userData, setUserData] = useState<IUsers | null>(null);
 
   // commented out for development
-  // const isAdmin = user?.publicMetadata?.role === "admin";
-  const isAdmin = true;
-
+  const [isAdmin, setIsAdmin] = useState(false);
   // load profile picture
   useEffect(() => {
     const getUser = async () => {
@@ -38,8 +36,9 @@ export default function Page() {
         if (!res.ok) {
           return;
         }
-
         const userObj = await res.json();
+        const role = userObj?.role ?? (Array.isArray(userObj) ? userObj[0]?.role : null);
+        setIsAdmin(role !== "user" && role != null);
         setUserData(Array.isArray(userObj) ? (userObj[0] ?? null) : userObj);
       }
     };
